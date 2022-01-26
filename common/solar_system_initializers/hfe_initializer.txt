@@ -138,9 +138,6 @@ hfe_initializer_egypt_main = {
 				portrait = rep12
 				# why ahets should have human names?
 				namelist = cybrxkhan_fantasy_egyptian
-				pops_can_be_colonizers = yes
-				can_generate_leaders = no
-				pops_can_migrate = no
 				# "Forever a slave" means forever a slave
 				can_be_modified = no
 				homeworld = this
@@ -166,9 +163,6 @@ hfe_initializer_egypt_main = {
 				portrait = rep12
 				# why ahets should have human names?
 				namelist = cybrxkhan_fantasy_egyptian
-				pops_can_be_colonizers = yes
-				can_generate_leaders = no
-				pops_can_migrate = no
 				# "Forever a slave" means forever a slave
 				can_be_modified = no
 				homeworld = this

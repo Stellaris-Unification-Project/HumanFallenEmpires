@@ -1137,7 +1137,7 @@ hfe_effect_pirate_path_target_home = {
 				exists = owner
 				owner = {
 					not = {
-						is_country = root.owner
+						is_same_empire = root.owner
 					}
 				}
 			}
@@ -1146,7 +1146,7 @@ hfe_effect_pirate_path_target_home = {
 			limit = {
 				exists = owner
 				owner = {
-					is_country = root.owner
+					is_same_empire = root.owner
 				}
 				# heavy check to the end
 				hfe_trigger_pirate_fleet_power_in_system_check = yes

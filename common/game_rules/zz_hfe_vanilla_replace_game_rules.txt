@@ -131,7 +131,7 @@ can_build_branch_office_on_planet = {
 			root = {
 				exists = overlord
 				overlord = {
-					is_country = prevprev.owner
+					is_same_empire = prevprev.owner
 				}
 			}
 			root = {

@@ -119,7 +119,7 @@ planet_event = {
 		owner = {
 			any_war = {
 				# any_war_participant = {
-				# 	is_country = root.owner
+				# 	is_same_empire = root.owner
 				# 	is_war_leader = no
 				# }
 				any_war_participant = {
@@ -201,11 +201,11 @@ ship_event = {
 		owner = {
 			any_war = {
 				# any_war_participant = {
-				# 	is_country = root.solar_system.owner
+				# 	is_same_empire = root.solar_system.owner
 				# 	is_war_leader = no
 				# }
 				any_war_participant = {
-					is_country = from.owner
+					is_same_empire = from.owner
 				}
 				# war leader use wg
 				any_war_participant = {
@@ -873,7 +873,7 @@ country_event = {
 				# power modifier
 				modifier = {
 					factor = 4
-					any_country = {
+					any_playable_country = {
 						is_country_type = default
 						any_owned_planet = {
 							has_planet_flag = fallen_empire_world
@@ -882,7 +882,7 @@ country_event = {
 				}
 				modifier = {
 					factor = 2
-					any_country = {
+					any_playable_country = {
 						is_country_type = default
 						or = {
 							relative_power = {
@@ -903,7 +903,7 @@ country_event = {
 				}
 				modifier = {
 					factor = 2
-					any_country = {
+					any_playable_country = {
 						is_country_type = default
 						or = {
 							relative_power = {
@@ -928,7 +928,7 @@ country_event = {
 					id = fallen_empires_awakening.3
 				}
 				# Notify players
-				every_country = {
+				every_playable_country = {
 					limit = {
 						is_ai = no
 					}
@@ -2684,7 +2684,7 @@ country_event = {
 	is_triggered_only = yes
 	trigger = {
 		has_galactic_emperor = no
-		count_country = {
+		count_playable_country = {
 			limit = {
 				is_country_type = default
 				is_at_war = no
@@ -2698,7 +2698,7 @@ country_event = {
 		}
 	}
 	immediate = {
-		random_country = {
+		random_playable_country = {
 			limit = {
 				is_country_type = default
 				is_at_war = no

@@ -18,7 +18,7 @@ event = {
 			}
 		}
 		# use every country because we need to set flag to host
-		every_country = {
+		every_playable_country = {
 			limit = {
 				is_ai = no
 			}

@@ -831,7 +831,7 @@ planet_event = {
 								factor = 2
 								owner = {
 									not = {
-										is_country = root.owner
+										is_same_empire = root.owner
 									}
 								}
 							}
@@ -840,7 +840,7 @@ planet_event = {
 								factor = 10
 								owner = {
 									not = {
-										is_country = root.owner
+										is_same_empire = root.owner
 									}
 									is_homicidal = yes
 								}

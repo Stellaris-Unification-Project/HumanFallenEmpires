@@ -832,7 +832,7 @@ country_event = {
 				}
 			}
 		}
-		every_country = {
+		every_playable_country = {
 			limit = {
 				is_country_type = default
 				exists = federation
