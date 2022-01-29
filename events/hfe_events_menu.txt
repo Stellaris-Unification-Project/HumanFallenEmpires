@@ -1,0 +1,663 @@
+namespace = hfe_menu
+# menu
+country_event = {
+	id = hfe_menu.1
+	title = hfe_menu.1.name
+	desc = {
+		trigger = {
+			text = hfe_menu.1.desc.0
+			success_text = {
+				text = hfe_menu.1.desc.1.0
+				hfe_trigger_menu_has_submenu = no
+				has_global_flag = hfe_installed
+			}
+			success_text = {
+				text = hfe_menu.1.desc.1.1
+				hfe_trigger_menu_has_submenu = no
+				not = {
+					has_global_flag = hfe_installed
+				}
+			}
+			success_text = {
+				text = hfe_menu.1.desc.2.0
+				hfe_trigger_menu_has_submenu = no
+				exists = event_target:hfe_egypt_country
+			}
+			success_text = {
+				text = hfe_menu.1.desc.2.1
+				hfe_trigger_menu_has_submenu = no
+				not = {
+					exists = event_target:hfe_egypt_country
+				}
+			}
+			success_text = {
+				text = hfe_menu.1.desc.3.0
+				hfe_trigger_menu_has_submenu = no
+				exists = event_target:hfe_future_country
+			}
+			success_text = {
+				text = hfe_menu.1.desc.3.1
+				hfe_trigger_menu_has_submenu = no
+				not = {
+					exists = event_target:hfe_future_country
+				}
+			}
+			success_text = {
+				text = hfe_menu.1.desc.4.0
+				hfe_trigger_menu_has_submenu = no
+				has_global_flag = hfe_plague_started
+			}
+			success_text = {
+				text = hfe_menu.1.desc.4.1
+				hfe_trigger_menu_has_submenu = no
+				not = {
+					has_global_flag = hfe_plague_started
+				}
+			}
+			# submenu
+			success_text = {
+				text = hfe_menu.pirate.submenu.desc
+				has_country_flag = hfe_menu_have_pirate_submenu
+			}
+			success_text = {
+				text = hfe_menu.population.submenu.desc
+				has_country_flag = hfe_menu_have_population_submenu
+			}
+			success_text = {
+				text = hfe_menu.leaders.submenu.desc
+				has_country_flag = hfe_menu_have_leaders_submenu
+			}
+			success_text = {
+				text = hfe_menu.war_in_heavens.submenu.desc
+				has_country_flag = hfe_menu_have_war_in_heavens_submenu
+			}
+		}
+	}
+	picture = {
+		trigger = {
+			has_country_flag = hfe_random_0
+		}
+		picture = GFX_evt_hfe_fallen
+	}
+	picture = {
+		trigger = {
+			has_country_flag = hfe_random_1
+		}
+		picture = GFX_evt_hfe_fallen_2
+	}
+	picture = {
+		trigger = {
+			has_country_flag = hfe_random_2
+		}
+		picture = GFX_evt_hfe_fallen_3
+	}
+	is_triggered_only = yes
+	immediate = {
+		hfe_effect_random_roll_flags_3_country = yes
+	}
+	# make humans undivided
+	option = {
+		name = hfe_menu.0
+		custom_tooltip = hfe_menu.0.tooltip
+		trigger = {
+			hfe_trigger_menu_has_submenu = no
+			has_country_flag = hfe_marked_as_human
+		}
+		hidden_effect = {
+			species = {
+				save_event_target_as = hfe_human_species
+			}
+			every_country = {
+				limit = {
+					has_country_flag = hfe_marked_as_human
+					exists = species
+					species = {
+						not = {
+							has_species_flag = hfe_marked_as_human_species
+						}
+					}
+				}
+				species = {
+					set_species_flag = hfe_marked_as_human_species
+				}
+			}
+			every_galaxy_species = {
+				limit = {
+					or = {
+						species_portrait = human
+						species_portrait = hfe_portrait_future
+						species_portrait = hfe_portrait_egypt
+						has_species_flag = hfe_marked_as_human_species
+					}
+					not = {
+						is_same_species = event_target:hfe_human_species
+					}
+				}
+				set_species_identity = event_target:hfe_human_species
+				set_species_flag = hfe_marked_as_human_species
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	option = {
+		name = hfe_menu.1
+		custom_tooltip = hfe_menu.1.tooltip
+		trigger = {
+			hfe_trigger_menu_has_submenu = no
+			not = {
+				has_country_flag = hfe_marked_as_human
+			}
+		}
+		hidden_effect = {
+			set_country_flag = hfe_marked_as_human
+			species = {
+				set_species_flag = hfe_marked_as_human_species
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# pirate menu
+	option = {
+		name = hfe_menu.pirate.defined_text
+		custom_tooltip = hfe_menu.pirate.tooltip.defined_text
+		trigger = {
+			or = {
+				hfe_trigger_menu_has_submenu = no
+				has_country_flag = hfe_menu_have_pirate_submenu
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_pirate_enabled = no
+				}
+				remove_global_flag = hfe_pirate_disable
+				every_country = {
+					limit = {
+						is_country_type = default
+					}
+					set_country_flag = pirates_spawned
+				}
+				every_country = {
+					limit = {
+						is_country_type = pirate
+					}
+					destroy_country = yes
+				}
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+			else_if = {
+				limit = {
+					has_country_flag = hfe_menu_have_pirate_submenu
+				}
+				set_global_flag = hfe_pirate_disable
+				remove_country_flag = hfe_menu_have_pirate_submenu
+				every_country = {
+					limit = {
+						is_country_type = default
+					}
+					remove_country_flag = pirates_spawned
+				}
+				every_country = {
+					limit = {
+						is_country_type = hfe_pirate
+					}
+					destroy_country = yes
+				}
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+			else = {
+				set_country_flag = hfe_menu_have_pirate_submenu
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+		}
+	}
+	# pathfind
+	option = {
+		name = hfe_menu.pirate.submenu.0.defined_text
+		custom_tooltip = hfe_menu.pirate.submenu.0.tooltip.defined_text
+		trigger = {
+			has_country_flag = hfe_menu_have_pirate_submenu
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_pirate_pathfind_enabled = yes
+				}
+				set_global_flag = hfe_pirate_pathfind_disabled
+			}
+			else = {
+				remove_global_flag = hfe_pirate_pathfind_disabled
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# population menu
+	option = {
+		name = hfe_menu.population.defined_text
+		custom_tooltip = hfe_menu.population.tooltip.defined_text
+		trigger = {
+			or = {
+				hfe_trigger_menu_has_submenu = no
+				has_country_flag = hfe_menu_have_population_submenu
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_population_enabled = no
+				}
+				remove_global_flag = hfe_population_disable
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+			else_if = {
+				limit = {
+					has_country_flag = hfe_menu_have_population_submenu
+				}
+				set_global_flag = hfe_population_disable
+				remove_country_flag = hfe_menu_have_population_submenu
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+			else = {
+				set_country_flag = hfe_menu_have_population_submenu
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+		}
+	}
+	# planet shield
+	option = {
+		name = hfe_menu.population.submenu.1.defined_text
+		custom_tooltip = hfe_menu.population.submenu.1.tooltip.defined_text
+		trigger = {
+			has_country_flag = hfe_menu_have_population_submenu
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_population_planetary_shield_enabled = yes
+				}
+				set_global_flag = hfe_population_planetary_shield_disabled
+				hfe_effect_population_remove_object_shield_global = yes
+			}
+			else = {
+				remove_global_flag = hfe_population_planetary_shield_disabled
+				every_galaxy_planet = {
+					planet_event = {
+						id = hfe_population.114
+					}
+				}
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# leaders menu
+	option = {
+		name = hfe_menu.leaders.defined_text
+		custom_tooltip = hfe_menu.leaders.tooltip.defined_text
+		trigger = {
+			or = {
+				hfe_trigger_menu_has_submenu = no
+				has_country_flag = hfe_menu_have_leaders_submenu
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_leaders_enabled = no
+				}
+				remove_global_flag = hfe_leaders_disable
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+			else_if = {
+				limit = {
+					has_country_flag = hfe_menu_have_leaders_submenu
+				}
+				set_global_flag = hfe_leaders_disable
+				remove_country_flag = hfe_menu_have_leaders_submenu
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+			else = {
+				set_country_flag = hfe_menu_have_leaders_submenu
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+		}
+	}
+	# leaders recrutment
+	option = {
+		name = hfe_menu.leaders.submenu.0.defined_text
+		custom_tooltip = hfe_menu.leaders.submenu.0.tooltip.defined_text
+		trigger = {
+			has_country_flag = hfe_menu_have_leaders_submenu
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_leaders_recrutment_enabled = yes
+				}
+				every_country = {
+					limit = {
+						has_modifier = hfe_leaders_started
+					}
+					remove_modifier = hfe_leaders_started
+				}
+				remove_global_flag = hfe_leaders_recrutment
+			}
+			else = {
+				set_global_flag = hfe_leaders_recrutment
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# leaders traits
+	option = {
+		name = hfe_menu.leaders.submenu.1.defined_text
+		custom_tooltip = hfe_menu.leaders.submenu.1.tooltip.defined_text
+		trigger = {
+			has_country_flag = hfe_menu_have_leaders_submenu
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_leaders_traits_enabled = yes
+				}
+				set_global_flag = hfe_leaders_traits_disable
+			}
+			else = {
+				remove_global_flag = hfe_leaders_traits_disable
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# disable planet decay
+	option = {
+		name = hfe_menu.3.defined_text
+		custom_tooltip = hfe_menu.3.tooltip.defined_text
+		trigger = {
+			hfe_trigger_menu_has_submenu = no
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_planet_decay_enabled = yes
+				}
+				remove_global_flag = hfe_planet_decay_enable
+			}
+			else = {
+				set_global_flag = hfe_planet_decay_enable
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# disable plague
+	option = {
+		name = hfe_menu.5.on
+		trigger = {
+			hfe_trigger_menu_has_submenu = no
+			has_global_flag = hfe_disable_plague
+		}
+		custom_tooltip = hfe_menu.5.on.tooltip
+		hidden_effect = {
+			remove_global_flag = hfe_disable_plague
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	option = {
+		name = hfe_menu.5.off
+		trigger = {
+			hfe_trigger_menu_has_submenu = no
+			not = {
+				has_global_flag = hfe_disable_plague
+			}
+		}
+		custom_tooltip = hfe_menu.5.off.tooltip
+		hidden_effect = {
+			set_global_flag = hfe_disable_plague
+			remove_global_flag = hfe_plague_started
+			remove_global_flag = hfe_plague_lvl_2
+			remove_global_flag = hfe_plague_lvl_3
+			every_galaxy_planet = {
+				limit = {
+					has_planet_flag = hfe_plague_planet
+				}
+				hfe_effect_plague_planet_clean = yes
+			}
+			every_country = {
+				if = {
+					limit = {
+						is_country_type = hfe_plague_zombie
+					}
+					destroy_country = yes
+				}
+			}
+			every_country = {
+				limit = {
+					has_event_chain = hfe_chain_plague_count
+				}
+				remove_country_flag = hfe_plague_block_planet
+				remove_country_flag = hfe_plague_block_pulse
+				end_event_chain = hfe_chain_plague_count
+			}
+			every_galaxy_pop = {
+				remove_pop_flag = hfe_plague_pop_immune
+			}
+			every_galaxy_species = {
+				limit = {
+					has_trait = hfe_species_trait_immune
+				}
+				modify_species = {
+					remove_trait = hfe_species_trait_immune
+				}
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# disable opinions
+	option = {
+		name = hfe_menu.8.defined_text
+		custom_tooltip = hfe_menu.8.tooltip.defined_text
+		trigger = {
+			hfe_trigger_menu_has_submenu = no
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_features_opinion_enabled = yes
+				}
+				remove_global_flag = hfe_features_opinion_disable
+			}
+			else = {
+				set_global_flag = hfe_features_opinion_disable
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# disable global events
+	option = {
+		name = hfe_menu.9.defined_text
+		custom_tooltip = hfe_menu.9.tooltip.defined_text
+		trigger = {
+			hfe_trigger_menu_has_submenu = no
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_global_enabled = yes
+				}
+				remove_global_flag = hfe_global_disable
+			}
+			else = {
+				set_global_flag = hfe_global_disable
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# war in heavens alteration menu
+	option = {
+		name = hfe_menu.war_in_heavens.defined_text
+		custom_tooltip = hfe_menu.war_in_heavens.tooltip.defined_text
+		trigger = {
+			or = {
+				hfe_trigger_menu_has_submenu = no
+				has_country_flag = hfe_menu_have_war_in_heavens_submenu
+			}
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_war_in_heavens_enabled = no
+				}
+				remove_global_flag = hfe_war_in_heavens_disable
+				set_global_flag = sleepers_awake_happened
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+			else_if = {
+				limit = {
+					has_country_flag = hfe_menu_have_war_in_heavens_submenu
+				}
+				set_global_flag = hfe_war_in_heavens_disable
+				# is it ok? What if fallen awakened?
+				remove_global_flag = sleepers_awake_happened
+				remove_country_flag = hfe_menu_have_war_in_heavens_submenu
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+			else = {
+				set_country_flag = hfe_menu_have_war_in_heavens_submenu
+				country_event = {
+					id = hfe_menu.1
+				}
+			}
+		}
+	}
+	# war in heavens custom wg
+	option = {
+		name = hfe_menu.war_in_heavens.submenu.0.defined_text
+		custom_tooltip = hfe_menu.war_in_heavens.submenu.0.tooltip.defined_text
+		trigger = {
+			has_country_flag = hfe_menu_have_war_in_heavens_submenu
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_war_in_heavens_custom_wg_enabled = yes
+				}
+				set_global_flag = hfe_war_in_heavens_custom_wg_disable
+			}
+			else = {
+				remove_global_flag = hfe_war_in_heavens_custom_wg_disable
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# war in heavens custom wg planet shift
+	option = {
+		name = hfe_menu.war_in_heavens.submenu.1.defined_text
+		custom_tooltip = hfe_menu.war_in_heavens.submenu.1.tooltip.defined_text
+		trigger = {
+			has_country_flag = hfe_menu_have_war_in_heavens_submenu
+		}
+		hidden_effect = {
+			if = {
+				limit = {
+					hfe_trigger_war_in_heavens_custom_wg_system_shift_enabled = yes
+				}
+				set_global_flag = hfe_war_in_heavens_custom_wg_system_shift_disable
+			}
+			else = {
+				remove_global_flag = hfe_war_in_heavens_custom_wg_system_shift_disable
+			}
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	# stats
+	option = {
+		name = hfe_menu.6
+		trigger = {
+			hfe_trigger_menu_has_submenu = no
+		}
+		hidden_effect = {
+			country_event = {
+				id = hfe_statistics.0
+			}
+		}
+	}
+	# customization
+	option = {
+		name = hfe_customization
+		trigger = {
+			hfe_trigger_menu_has_submenu = no
+			exists = ruler
+		}
+		hidden_effect = {
+			country_event = {
+				id = hfe_customization.0
+			}
+		}
+	}
+	option = {
+		name = modmenu_return
+		trigger = {
+			hfe_trigger_menu_has_submenu = yes
+		}
+		hidden_effect = {
+			hfe_effect_menu_remove_submenu = yes
+			country_event = {
+				id = hfe_menu.1
+			}
+		}
+	}
+	option = {
+		name = modmenu_exit
+		default_hide_option = yes
+		hidden_effect = {
+			hfe_effect_menu_remove_submenu = yes
+		}
+	}
+}

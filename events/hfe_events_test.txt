@@ -1,0 +1,968 @@
+#
+namespace = hfe_test
+country_event = {
+	id = hfe_test.0
+	title = _hfe_scripted_loc_test_
+	desc = _hfe_scripted_loc_test_
+	picture = GFX_evt_glitchy_matrix
+	is_triggered_only = yes
+	option = {
+		name = hfe_population_disaster
+	}
+}
+
+country_event = {
+	id = hfe_test.1
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		# if = {
+		# 	limit = {
+		# 		is_difficulty > -2
+		# 	}
+		# 	log = "is_difficulty > -2"
+		# }
+		# if = {
+		# 	limit = {
+		# 		is_difficulty > -1
+		# 	}
+		# 	log = "is_difficulty > -1"
+		# }
+		if = {
+			limit = {
+				is_difficulty > 0
+			}
+			log = "is_difficulty > 0"
+		}
+		if = {
+			limit = {
+				is_difficulty > 1
+			}
+			log = "is_difficulty > 1"
+		}
+		if = {
+			limit = {
+				is_difficulty > 2
+			}
+			log = "is_difficulty > 2"
+		}
+		if = {
+			limit = {
+				is_difficulty > 3
+			}
+			log = "is_difficulty > 3"
+		}
+		if = {
+			limit = {
+				is_difficulty > 4
+			}
+			log = "is_difficulty > 4"
+		}
+		# if = {
+		# 	limit = {
+		# 		is_difficulty > 5
+		# 	}
+		# 	log = "is_difficulty > 5"
+		# }
+		# if = {
+		# 	limit = {
+		# 		is_difficulty > 6
+		# 	}
+		# 	log = "is_difficulty > 6"
+		# }
+		# if = {
+		# 	limit = {
+		# 		is_difficulty > 7
+		# 	}
+		# 	log = "is_difficulty > 7"
+		# }
+		# if = {
+		# 	limit = {
+		# 		is_difficulty > 8
+		# 	}
+		# 	log = "is_difficulty > 8"
+		# }
+	}
+}
+
+# country_event = {
+# 	id = hfe_test.2
+# 	hide_window = yes
+# 	is_triggered_only = yes
+# 	immediate = {
+# 		random_owned_ship = {
+# 			limit = {
+# 				is_ship_class = shipclass_military
+# 			}
+# 			create_fleet = {
+# 				effect = {
+# 					create_ship = {
+# 						design = prevprev
+# 						effect = {
+# 							log = "[prevprev.GetName]"
+# 						}
+# 					}
+# 					create_ship = {
+# 						random_existing_design = corvette
+# 						effect = {
+# 							log = "[prevprev.GetName]"
+# 						}
+# 					}
+# 					set_owner = root
+# 					set_location = root.capital_scope
+# 				}
+# 			}
+# 		}
+# 	}
+# }
+country_event = {
+	id = hfe_test.3
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		# random_pool_leader = {
+		# 	limit = {
+		# 		leader_class = governor
+		# 	}
+		# 	root = {
+		# 		clone_leader = {
+		# 			target = prev
+		# 		}
+		# 	}
+		# }
+		# if = {
+		# 	limit = {
+		# 		opinion = {
+		# 			who = event_target:hfe_egypt_country
+		# 			value > 40
+		# 		}
+		# 	}
+		# 	log = "opinion > 40"
+		# }
+		# if = {
+		# 	limit = {
+		# 		opinion = {
+		# 			who = event_target:hfe_egypt_country
+		# 			value < 40
+		# 		}
+		# 	}
+		# 	log = "opinion < 40"
+		# }
+		every_galaxy_pop = {
+			root = {
+				change_variable = {
+					which = test_all
+					value = 1
+				}
+			}
+		}
+		every_galaxy_pop = {
+			limit = {
+				is_unemployed = yes
+			}
+			root = {
+				change_variable = {
+					which = test_has_no_job
+					value = 1
+				}
+			}
+		}
+		every_galaxy_pop = {
+			limit = {
+				has_job = administrator
+			}
+			root = {
+				change_variable = {
+					which = test_administrator
+					value = 1
+				}
+			}
+		}
+		log = "[root.test_all] [root.test_has_no_job] [root.test_administrator]"
+	}
+}
+
+# country_event = {
+# 	id = hfe_test.6
+# 	title = "0"
+# 	desc = "0"
+# 	desc = "00"
+# 	desc = "000"
+# 	desc = {
+# 		exclusive_trigger = {
+# 			always = yes
+# 		}
+# 		trigger = {
+# 			success_text = {
+# 				always = yes
+# 				text = "1"
+# 			}
+# 			success_text = {
+# 				always = no
+# 				text = "2"
+# 			}
+# 			success_text = {
+# 				text = "3"
+# 			}
+# 		}
+# 	}
+# 	picture = GFX_evt_alien_city
+# 	is_triggered_only = yes
+# 	option = {
+# 		name = "0"
+# 	}
+# }
+country_event = {
+	id = hfe_test.7
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		# give_technology = {
+		# 	message = no
+		# 	tech = hfe_tech_features_exodus
+		# }
+		# give_technology = {
+		# message = no
+		# tech = hfe_tech_brainworm_reservation_0
+		# }
+		change_variable = {
+			which = hfe_building_thoth_module_energy
+			value = 10
+		}
+		change_variable = {
+			which = hfe_building_thoth_module_mineral
+			value = 10
+		}
+		change_variable = {
+			which = hfe_building_thoth_module_food
+			value = 10
+		}
+		change_variable = {
+			which = hfe_building_thoth_module_science
+			value = 10
+		}
+		change_variable = {
+			which = hfe_building_thoth_module_industry
+			value = 10
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.8
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		closest_system = {
+			limit = {
+				or = {
+					and = {
+						exists = owner
+						owner = {
+							is_country = root
+						}
+					}
+					has_presence = no
+				}
+				any_system_planet = {
+					habitability = {
+						who = root.species
+						value > 0.2
+					}
+					not = {
+						exists = owner
+					}
+				}
+			}
+			random_system_planet = {
+				limit = {
+					habitability = {
+						who = root.species
+						value > 0.2
+					}
+					not = {
+						exists = owner
+					}
+				}
+				create_colony = {
+					owner = root
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = hfe_test.9
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_owned_pop = {
+			modify_species = {
+				add_trait = trait_psionic
+			}
+		}
+		starbase = {
+			set_starbase_building = {
+				slot = 1
+				building = hfe_starbase_building_population_navigator
+			}
+		}
+		owner = {
+			add_resource = {
+				sr_zro = 100
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = hfe_test.10
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		if = {
+			limit = {
+				is_planet_class = root
+			}
+			log = "asdas"
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.11
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		set_country_flag = hfe_future_contacted
+		set_country_flag = hfe_egypt_contacted
+		every_country = {
+			limit = {
+				hfe_trigger_is_human_fallen = yes
+			}
+			establish_communications_no_message = root
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.12
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_relation = {
+			prev = {
+				add_casus_belli = {
+					type = hfe_cb_annex
+					who = prev
+					days = 365
+				}
+			}
+		}
+	}
+}
+
+# find memorial planets
+country_event = {
+	id = hfe_test.13
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_system = {
+			limit = {
+				has_star_flag = hfe_memorial_system
+			}
+			hfe_effect_save_event_target = yes
+			log = "[this.GetName]"
+		}
+		begin_event_chain = {
+			event_chain = abandoned_terraforming_chain
+		}
+		create_point_of_interest = {
+			id = hfe_test.13.0
+			name = hfe_test.13
+			event_chain = abandoned_terraforming_chain
+			location = event_target:hfe_event_target_0
+		}
+		create_point_of_interest = {
+			id = hfe_test.13.1
+			name = hfe_test.13
+			event_chain = abandoned_terraforming_chain
+			location = event_target:hfe_event_target_1
+		}
+		create_point_of_interest = {
+			id = hfe_test.13.2
+			name = hfe_test.13
+			event_chain = abandoned_terraforming_chain
+			location = event_target:hfe_event_target_2
+		}
+		create_point_of_interest = {
+			id = hfe_test.13.3
+			name = hfe_test.13
+			event_chain = abandoned_terraforming_chain
+			location = event_target:hfe_event_target_3
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.14
+	title = utopia.3340.name
+	desc = utopia.3340.name
+	diplomatic = yes
+	is_triggered_only = yes
+	picture_event_data = {
+		portrait = hfe_portrait_egypt_female_03
+	}
+	option = {
+		name = utopia.3340.name
+	}
+}
+
+country_event = {
+	id = hfe_test.15
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_country = {
+			limit = {
+				is_gestalt = no
+			}
+			every_owned_pop = {
+				limit = {
+					is_unemployed = yes
+				}
+				root = {
+					change_variable = {
+						which = unemployed
+						value = 1
+					}
+				}
+			}
+			every_owned_pop = {
+				limit = {
+					has_job = administrator
+				}
+				root = {
+					change_variable = {
+						which = administrator
+						value = 1
+					}
+				}
+			}
+		}
+		log = "unemployed [this.unemployed] administrator [this.administrator]"
+	}
+}
+
+country_event = {
+	id = hfe_test.16
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_country = {
+			limit = {
+				is_country_type = hfe_pirate
+			}
+			every_owned_fleet = {
+				fleet_event = {
+					id = hfe_test.17
+				}
+			}
+		}
+	}
+}
+
+fleet_event = {
+	id = hfe_test.17
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		hfe_effect_pirate_path_fleet_reset = yes
+	}
+}
+
+# log every fleet
+country_event = {
+	id = hfe_test.18
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		set_global_flag = hfe_pirate_logs
+		set_global_flag = hfe_plague_logs
+		set_global_flag = hfe_general_logs
+		set_global_flag = HFE_TSP_spawn_test
+		every_country = {
+			limit = {
+				is_country_type = hfe_pirate
+			}
+			every_owned_fleet = {
+				set_fleet_flag = hfe_pirate_log_fleet
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.19
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		log = "destroed [this.GetName] country"
+		if = {
+			limit = {
+				exists = from
+			}
+			log = "killer exists and this is [from.GetName]"
+		}
+		every_owned_fleet = {
+			log = "remain fleet [this.GetName]"
+		}
+		every_owned_planet = {
+			log = "remain planet [this.GetName]"
+		}
+		every_owned_leader = {
+			log = "remain leader [this.GetName]"
+		}
+		every_owned_starbase = {
+			log = "remain starbase [this.GetName]"
+		}
+		every_system_within_border = {
+			log = "remain system [this.GetName]"
+		}
+		if = {
+			limit = {
+				has_relic = r_galatron
+			}
+			log = "relics also remain"
+		}
+		if = {
+			limit = {
+				resource_stockpile_compare = {
+					resource = alloys
+					value > 0
+				}
+			}
+			log = "resources also remain"
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.20
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_country = {
+			limit = {
+				is_country_type = hfe_pirate
+			}
+			add_resource = {
+				alloys = 10000
+			}
+			country_event = {
+				id = hfe_pirate.2
+			}
+		}
+	}
+}
+
+ship_event = {
+	id = hfe_test.21
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		owner = {
+			or = {
+				is_country_type = hfe_pirate
+				is_country_type = hfe_drone
+			}
+		}
+		is_ship_class = shipclass_military
+	}
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = hfe_pirate_logs
+				owner = {
+					is_country_type = hfe_pirate
+				}
+			}
+			log = "pirate ship upgraded [fleet.GetName] [owner.GetName]"
+		}
+		else_if = {
+			limit = {
+				has_global_flag = hfe_general_logs
+			}
+			log = "drone ship upgraded [fleet.GetName] [owner.GetName]"
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.22
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		while = {
+			count = 10
+			random_system = {
+				weights = {
+					base = 1
+					modifier = {
+						add = 100
+						not = {
+							exists = owner
+						}
+						has_presence = no
+					}
+				}
+				hfe_effect_spawn_space_monster = yes
+			}
+		}
+	}
+}
+
+#country_event = {
+#	id = hfe_test.23
+#	hide_window = yes
+#	is_triggered_only = yes
+#
+#	immediate = {
+#		# random_playable_country = {
+#		# 	limit = {
+#		# 		not = {
+#		# 			is_country = root
+#		# 		}
+#		# 	}
+#		# 	add_relic = r_galatron
+#		# 	establish_communications_no_message = root
+#		# 	add_opinion_modifier = {
+#		# 		who = root
+#		# 		modifier = opinion_liberated_us
+#		# 	}
+#		# 	every_owned_pop = {
+#		# 		kill_pop = yes
+#		# 	}
+#		# }
+#		random_owned_pop = {
+#			limit = {
+#				not = {
+#					has_trait = hfe_species_trait_test
+#				}
+#			}
+#			modify_species = {
+#				add_trait = hfe_species_trait_test
+#			}
+#		}
+#		random_owned_pop = {
+#			limit = {
+#				not = {
+#					has_trait = hfe_species_trait_test
+#				}
+#			}
+#			modify_species = {
+#				base = none
+#				add_trait = hfe_species_trait_test
+#			}
+#		}
+#	}
+#}
+country_event = {
+	id = hfe_test.24
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		ruler = {
+			add_trait = hfe_ruler_trait_warcrime_tourism
+		}
+		every_relation = {
+			add_trust = {
+				amount = 500
+				who = root
+			}
+			root = {
+				add_casus_belli = {
+					type = hfe_cb_total_war
+					who = prev
+					days = 30
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.25
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		random_relation = {
+			add_trust = {
+				amount = 100
+				who = root
+			}
+			destroy_country = yes
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.26
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_playable_country = {
+			every_system_within_border = {
+				every_system_planet = {
+					set_owner = root
+				}
+				starbase = {
+					set_owner = root
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = hfe_test.27
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		add_modifier = {
+			modifier = hfe_population_boom
+			days = 3650
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.28
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		random_owned_pop = {
+			create_country = {
+				type = default
+				effect = {
+					root.capital_scope = {
+						set_owner = prev
+					}
+					set_player = root
+				}
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = hfe_test.29
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		planet_event = {
+			id = hfe_test.30
+			days = 1
+		}
+	}
+}
+
+planet_event = {
+	id = hfe_test.30
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		any_owned_species = {
+			always = yes
+		}
+	}
+	immediate = {
+		owner = {
+			add_resource = {
+				minerals = 10000
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.31
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_owned_species = {
+			limit = {
+				has_citizenship_type = {
+					country = root
+					type = citizenship_full_machine
+				}
+			}
+			set_military_service_type = {
+				country = root
+				type = military_service_full
+				cooldown = yes
+			}
+			set_migration_controls = {
+				country = root
+				type = no
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.32
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_federation = {
+			if = {
+				limit = {
+					relative_power = {
+						who = root
+						value = superior
+					}
+				}
+				root = {
+					add_resource = {
+						minerals = 100
+					}
+				}
+			}
+		}
+		every_country = {
+			limit = {
+				is_country_type = default
+				exists = federation
+			}
+			if = {
+				limit = {
+					relative_power = {
+						who = root
+						value = superior
+					}
+				}
+				root = {
+					add_resource = {
+						energy = 100
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.33
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_owned_pop = {
+			limit = {
+				is_same_species = root
+				hfe_trigger_is_robot = yes
+			}
+			change_species = root
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.34
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		set_variable = {
+			which = max_count
+			value = 0
+		}
+		every_system_within_border = {
+			limit = {
+				any_system_planet = {
+					habitable_planet = yes
+				}
+			}
+			root = {
+				set_variable = {
+					which = current_count
+					value = 0
+				}
+			}
+			every_system_planet = {
+				limit = {
+					NOR = {
+						is_planet_class = pc_gas_giant
+						is_planet_class = pc_ringworld_habitable
+						is_planet_class = pc_ringworld_habitable_damaged
+						is_planet_class = pc_ringworld_tech
+						is_planet_class = pc_ringworld_tech_damaged
+						is_planet_class = pc_ringworld_seam
+						is_planet_class = pc_ringworld_seam_damaged
+						is_planet_class = pc_habitat
+						is_planet_class = pc_asteroid
+						is_planet_class = pc_ice_asteroid
+						is_planet_class = pc_city
+						is_planet_class = pc_relic
+						is_star = yes
+					}
+				}
+				root = {
+					change_variable = {
+						which = current_count
+						value = 1
+					}
+				}
+			}
+			root = {
+				if = {
+					limit = {
+						check_variable = {
+							which = current_count
+							value >= max_count
+						}
+					}
+					set_variable = {
+						which = max_count
+						value = current_count
+					}
+					log = "[root.current_count] planets in system [prev.GetName]"
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_test.35
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		is_country = owner
+	}
+}
+
+# country_event = { # Only called by Console Command cheat codes
+# 	id = hfe_test.28
+# 	title = "HFE_INIT_SPAWN_LOG_TSP"
+# 	desc = "HFE_INIT_SPAWN_LOG_TSP_DESC"
+# 	picture = GFX_evt_hfe_fallen_2
+# 	is_triggered_only = yes
+# 	option = {
+# 		allow = {
+# 			custom_tooltip = {
+# 				fail_text = "HFE_TSP_SPAWN_TEST_ALREADY_ENABLED"
+# 				NOT = { has_global_flag = HFE_TSP_spawn_test }
+# 			}
+# 		}
+# 		name = "HFE_TSP_spawn_test_yes"
+# 		set_global_flag = HFE_TSP_spawn_test
+# 		custom_tooltip = HFE_TSP_SPAWN_TEST_GLOBAL_FLAG_TOOLTIP
+# 	}
+# 	option = {
+# 		name = hfe_not_interested
+# 		remove_global_flag = HFE_TSP_spawn_test
+# 		custom_tooltip = HFE_TSP_SPAWN_TEST_GLOBAL_FLAG_TOOLTIP_REMOVE
+# 	}
+# }

@@ -1,0 +1,238 @@
+#
+#This rule is a condition for bombarding planets
+#Root = fleet, potential attacker
+#From = planet, potential target
+can_orbital_bombard = {
+	exists = from.OWNER
+	NOT = {
+		any_owned_ship = {
+			is_ship_size = colossus
+		}
+	}
+	# mod
+	exists = root.OWNER
+	exists = from.CONTROLLER
+	or = {
+		root.OWNER = {
+			is_hostile = from.CONTROLLER
+		}
+		AND = {
+			root.OWNER = {
+				NOR = {
+					has_policy_flag = interference_passive
+					has_policy_flag = interference_active
+				}
+			}
+			from.OWNER = {
+				is_country_type = primitive
+			}
+		}
+	}
+}
+
+# Checks if a pop can procreate
+# This = Species
+# Root = Planet
+can_species_procreate = {
+	is_sapient = yes
+	NOR = {
+		has_trait = trait_machine_unit
+		has_trait = trait_mechanical
+	}
+	NAND = {
+		root = {
+			has_modifier = slave_colony
+		}
+		NOT = {
+			has_citizenship_type = {
+				type = citizenship_slavery
+				country = root.owner
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_trait = trait_necrophage
+		}
+		NOT = {
+			root = {
+				any_owned_species = {
+					has_population_control = {
+						country = root.owner
+						value = no
+					}
+					species_can_be_necrophaged = yes
+				}
+			}
+		}
+	}
+	NOT = {
+		has_species_flag = nivlac_no_procreation
+	}
+	# mod
+	not = {
+		has_trait = hfe_species_trait_brainworm
+	}
+}
+
+#Root = country
+#This = planet
+can_colonize_outside_borders = {
+	exists = root
+	root = {
+		is_country_type = hfe_features_exodus
+	}
+	exists = solar_system
+	solar_system = {
+		not = {
+			exists = owner
+		}
+	}
+}
+
+# This = country
+can_build_branch_offices = {
+	custom_tooltip = {
+		fail_text = BRANCH_OFFICE_NOT_MEGACORP
+		OR = {
+			has_authority = auth_corporate
+			has_civic = civic_galactic_sovereign_megacorp
+			# mod
+			is_country_type = hfe_pirate
+		}
+	}
+}
+
+# This = planet
+# Root = country
+can_build_branch_office_on_planet = {
+	custom_tooltip = {
+		fail_text = requires_recipient_not_fanatic_purifiers
+		exists = owner
+		owner = {
+			OR = {
+				is_same_species = root
+				NOT = {
+					has_civic = civic_fanatic_purifiers
+				}
+			}
+		}
+	}
+	custom_tooltip = {
+		fail_text = BRANCH_OFFICE_NOT_COMMERCIAL_PACT
+		exists = owner
+		OR = {
+			# mod
+			# pirate
+			root = {
+				is_country_type = hfe_pirate
+				is_forced_friendly = prev.owner
+			}
+			root = {
+				exists = overlord
+				overlord = {
+					is_country = prevprev.owner
+				}
+			}
+			root = {
+				is_criminal_syndicate = yes
+			}
+			owner = {
+				has_commercial_pact = root
+			}
+			owner = {
+				is_in_federation_with = root
+			}
+			# allow branch offices in subsidiaries and vice versa
+			# this is broken
+			# root = {
+			# 	is_subject = yes
+			# 	is_subject_type = subsidiary
+			# 	overlord = {
+			# 		is_same_value = owner
+			# 	}
+			# }
+			owner = {
+				is_subject = yes
+				is_subject_type = subsidiary
+				overlord = {
+					is_same_value = root
+				}
+			}
+			AND = {
+				root = {
+					has_civic = civic_galactic_sovereign_megacorp
+				}
+				owner = {
+					is_galactic_community_member = yes
+				}
+			}
+			AND = {
+				root = {
+					has_modifier = imperial_charter
+				}
+				owner = {
+					is_galactic_community_member = yes
+				}
+			}
+		}
+	}
+	custom_tooltip = {
+		fail_text = BRANCH_OFFICE_CRIMINAL_HERITAGE_HAS_TRUCE
+		exists = owner
+		OR = {
+			root = {
+				is_criminal_syndicate = no
+			}
+			owner = {
+				NOR = {
+					has_truce = root
+					is_at_war_with = root
+				}
+			}
+		}
+	}
+	custom_tooltip = {
+		fail_text = BRANCH_OFFICE_CRIMINAL_COOLDOWN
+		exists = owner
+		OR = {
+			root = {
+				is_criminal_syndicate = no
+			}
+			AND = {
+				root = {
+					is_criminal_syndicate = yes
+				}
+				NOT = {
+					has_planet_flag = criminal_branch_closed_cooldown_planet@root
+				}
+			}
+		}
+	}
+}
+
+# Root = current planet
+# This = pop
+# Purge, Sapience, Migration Controls policy (ignored by Gestalts and Synths), and target habitability are checked in code.
+can_pop_auto_migrate = {
+	or = {
+		is_unemployed = yes
+		hfe_trigger_unemployed_auto_migrate = yes
+	}
+	is_being_assimilated = no
+	OR = {
+		owner = {
+			or = {
+				is_country_type = hfe_pirate
+				hfe_trigger_is_human_fallen = yes
+			}
+		}
+		AND = {
+			is_shackled_robot = no
+			is_enslaved = no
+		}
+		planet = {
+			has_building = building_slave_processing
+		}
+	}
+}

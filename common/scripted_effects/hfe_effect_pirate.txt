@@ -1,0 +1,2891 @@
+# pirate
+# for country
+hfe_effect_pirate_diplomacy_remove_flags = {
+	remove_country_flag = hfe_pirate.101.raid_menu
+	remove_country_flag = hfe_pirate.101.traid_menu
+	remove_country_flag = hfe_pirate.101.deal_offer
+	remove_country_flag = hfe_pirate.101.slave_menu
+	remove_country_flag = hfe_pirate.101.service_menu
+	remove_country_flag = hfe_pirate.101.psi_test_menu
+	remove_country_flag = hfe_pirate.101.psi_test_end
+	remove_country_flag = hfe_pirate.101.psi_test_end_win
+	remove_country_flag = hfe_pirate.101.psi_test_end_lose
+	remove_country_flag = hfe_pirate.101.psi_test_menu
+	hfe_effect_cards_clean_all = yes
+	if = {
+		limit = {
+			is_variable_set = hfe_pirate_psi_test_score
+		}
+		clear_variable = hfe_pirate_psi_test_score
+	}
+	remove_country_flag = hfe_pirate.101.casino_menu
+	remove_country_flag = hfe_pirate.101.casino_menu.challenge
+}
+
+hfe_effect_pirate_protect_cost_shift = {
+	if = {
+		limit = {
+			relative_power = {
+				who = event_target:hfe_pirate_country
+				value > superior
+				category = fleet
+			}
+		}
+		add_resource = {
+			energy = -250
+			alloys = -100
+		}
+		event_target:hfe_pirate_country = {
+			add_resource = {
+				energy = 250
+				alloys = 100
+			}
+		}
+	}
+	else = {
+		add_resource = {
+			energy = -500
+			alloys = -200
+		}
+		event_target:hfe_pirate_country = {
+			add_resource = {
+				energy = 500
+				alloys = 200
+			}
+		}
+	}
+}
+
+hfe_effect_pirate_raid_cost_shift = {
+	add_resource = {
+		energy = @hfe_pirate_raid_cost_energy_minus
+		alloys = @hfe_pirate_raid_cost_alloys_minus
+	}
+	event_target:hfe_pirate_country = {
+		add_resource = {
+			energy = @hfe_pirate_raid_cost_energy
+			alloys = @hfe_pirate_raid_cost_alloys
+		}
+	}
+}
+
+hfe_effect_pirate_slave_cost_shift = {
+	add_resource = {
+		energy = @hfe_pirate_slave_cost_energy_minus
+		alloys = @hfe_pirate_slave_cost_alloys_minus
+	}
+	event_target:hfe_pirate_country = {
+		add_resource = {
+			energy = @hfe_pirate_slave_cost_energy
+			alloys = @hfe_pirate_slave_cost_alloys
+		}
+	}
+}
+
+# this is raid target
+hfe_effect_pirate_raid_set_flag = {
+	add_opinion_modifier = {
+		who = event_target:hfe_pirate_country
+		modifier = hfe_opinion_pirate_prior_target
+	}
+	event_target:hfe_pirate_country = {
+		add_opinion_modifier = {
+			who = prev
+			modifier = hfe_opinion_pirate_prior_target
+		}
+	}
+}
+
+# create pirate
+# return event target pirate_band, need event target hfe_pirate_target
+hfe_effect_pirate_init = {
+	save_event_target_as = hfe_pirate_target
+	set_timed_country_flag = {
+		flag = hfe_pirate_spawned
+		years = @hfe_pirate_spawn_cooldown
+	}
+	random_system = {
+		limit = {
+			closest_system = {
+				max_steps = 10
+				limit = {
+					is_owned_by = event_target:hfe_pirate_target
+				}
+			}
+			hfe_trigger_pirate_valid_base_system = yes
+		}
+		weights = {
+			base = 1
+			modifier = {
+				factor = 10
+				has_trade_route = yes
+			}
+			modifier = {
+				factor = 10
+				not = {
+					any_neighbor_system = {
+						has_presence = yes
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				count_system_planet = {
+					count > 0
+					limit = {
+						has_deposit = yes
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				count_system_planet = {
+					count > 1
+					limit = {
+						has_deposit = yes
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				count_system_planet = {
+					count > 2
+					limit = {
+						has_deposit = yes
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				count_system_planet = {
+					count > 3
+					limit = {
+						has_deposit = yes
+					}
+				}
+			}
+			modifier = {
+				factor = 2
+				count_system_planet = {
+					count > 4
+					limit = {
+						has_deposit = yes
+					}
+				}
+			}
+		}
+		# for vanilla localization
+		save_event_target_as = pirate_system
+		hfe_effect_pirate_init_country = yes
+		hfe_effect_pirate_init_colony = yes
+		every_neighbor_system = {
+			set_surveyed = {
+				surveyed = yes
+				surveyor = event_target:hfe_pirate_clan
+			}
+		}
+	}
+	if = {
+		limit = {
+			has_event_chain = hfe_chain_pirate_count
+		}
+		country_event = {
+			id = hfe_pirate.7
+			days = 1
+			random = 15
+		}
+	}
+	else = {
+		begin_event_chain = {
+			event_chain = hfe_chain_pirate_count
+			target = this
+		}
+		add_event_chain_counter = {
+			event_chain = hfe_chain_pirate_count
+			counter = hfe_chain_pirate_count_clan
+			amount = 1
+		}
+		set_country_flag = pirate_encountered
+		country_event = {
+			id = hfe_pirate.1
+			days = 1
+			random = 15
+		}
+	}
+}
+
+# for system, asteroid ideally, need event target pirate_band
+hfe_effect_pirate_init_colony = {
+	random_system_planet = {
+		limit = {
+			hfe_trigger_pirate_valid_base_planet = yes
+		}
+		weights = {
+			base = 1
+			modifier = {
+				factor = 100
+				has_deposit = no
+			}
+		}
+		hfe_effect_pirate_change_to_pc_pirate_base = yes
+		create_colony = {
+			owner = event_target:hfe_pirate_clan
+		}
+		every_owned_pop = {
+			kill_pop = yes
+		}
+		if = {
+			limit = {
+				has_global_flag = hfe_pirate_logs
+			}
+			log = "pirate created new base \\[this.GetName] in \\[solar_system.GetName] system, owner: \\[owner.GetName]"
+		}
+		hfe_effect_create_starbase_starport_from_planet = yes
+	}
+}
+
+# for planet
+hfe_effect_pirate_change_to_pc_pirate_base = {
+	if = {
+		limit = {
+			is_planet_class = pc_ice_asteroid
+		}
+		set_planet_flag = hfe_pirate_former_pc_ice_asteroid
+	}
+	else_if = {
+		limit = {
+			is_planet_class = pc_rare_crystal_asteroid
+		}
+		set_planet_flag = hfe_pirate_former_pc_rare_crystal_asteroid
+	}
+	change_pc = hfe_pc_pirate_base
+}
+
+# for planet
+hfe_effect_pirate_change_to_pc_asteroid = {
+	log = "converting to asteroid \\[this.GetName]"
+	if = {
+		limit = {
+			exists = owner
+			owner = {
+				is_country_type = hfe_pirate
+				num_owned_planets = 1
+			}
+		}
+		owner = {
+			hfe_effect_pirate_flee_fleets = yes
+		}
+	}
+	hfe_effect_clear_buildings_and_destroy_colony = yes
+	if = {
+		limit = {
+			has_planet_flag = hfe_pirate_former_pc_ice_asteroid
+		}
+		remove_planet_flag = hfe_pirate_former_pc_ice_asteroid
+		change_pc = pc_ice_asteroid
+	}
+	else_if = {
+		limit = {
+			has_planet_flag = hfe_pirate_former_pc_rare_crystal_asteroid
+		}
+		remove_planet_flag = hfe_pirate_former_pc_rare_crystal_asteroid
+		change_pc = pc_rare_crystal_asteroid
+	}
+	else = {
+		change_pc = pc_asteroid
+	}
+}
+
+hfe_effect_pirate_init_country = {
+	create_country = {
+		type = hfe_pirate
+		day_zero_contact = no
+		species = event_target:hfe_pirate_target
+		name_list = hfe_namelist_pirate
+		released_from_country = event_target:hfe_pirate_target
+		ignore_initial_colony_error = yes
+		origin = hfe_origin_pirate
+		effect = {
+			change_country_flag = {
+				icon = {
+					category = zoological
+					file = flag_zoological_1.dds
+				}
+				background = {
+					category = backgrounds
+					file = 00_solid.dds
+				}
+				colors = {
+					"dark_grey"
+					"dark_grey"
+					"black"
+					"beige"
+				}
+			}
+			randomize_flag_symbol = pirate
+			save_event_target_as = hfe_pirate_clan
+			set_country_flag = hfe_pirate
+			# for vanilla localization
+			save_event_target_as = pirate_band
+			if = {
+				limit = {
+					has_authority = auth_corporate
+				}
+				change_government = {
+					authority = auth_oligarchic
+					civics = random
+				}
+			}
+			if = {
+				limit = {
+					has_ethic = ethic_pacifist
+				}
+				country_remove_ethic = ethic_pacifist
+				country_add_ethic = ethic_militarist
+			}
+			else_if = {
+				limit = {
+					has_ethic = ethic_fanatic_pacifist
+				}
+				country_remove_ethic = ethic_fanatic_pacifist
+				country_add_ethic = ethic_fanatic_militarist
+			}
+			add_modifier = {
+				modifier = hfe_pirate_country_unkeep
+				days = -1
+			}
+			random_list = {
+				100 = {
+					set_graphical_culture = hfe_graphical_culture_pirate
+				}
+				10 = {
+					set_graphical_culture = hfe_graphical_culture_pirate_full_color
+				}
+				10 = {
+					set_graphical_culture = hfe_graphical_culture_pirate_full_color_2
+				}
+				10 = {
+					set_graphical_culture = hfe_graphical_culture_pirate_full_color_3
+				}
+				10 = {
+					set_graphical_culture = hfe_graphical_culture_pirate_full_color_4
+				}
+				10 = {
+					set_graphical_culture = hfe_graphical_culture_pirate_full_color_5
+				}
+			}
+			# for leaders
+			add_resource = {
+				energy = 2000
+			}
+			if = {
+				limit = {
+					end_game_years_passed > 0
+				}
+				add_resource = {
+					minerals = 10000
+					alloys = 2500
+				}
+				add_modifier = {
+					modifier = hfe_pirate_country_boost
+					days = 3650
+				}
+			}
+			else_if = {
+				limit = {
+					mid_game_years_passed > 0
+				}
+				add_resource = {
+					minerals = 5000
+					alloys = 1250
+				}
+				add_modifier = {
+					modifier = hfe_pirate_country_boost
+					days = 1825
+				}
+			}
+			else = {
+				add_resource = {
+					minerals = 1000
+					alloys = 250
+				}
+				add_modifier = {
+					modifier = hfe_pirate_country_boost
+					days = 365
+				}
+			}
+			set_relation_flag = {
+				who = event_target:hfe_pirate_target
+				flag = pirate_relation
+			}
+			every_country = {
+				limit = {
+					is_country_type = primitive
+				}
+				establish_communications_no_message = prev
+				prev = {
+					if = {
+						limit = {
+							is_xenophobe = no
+						}
+						set_faction_hostility = {
+							target = prev
+							set_hostile = no
+							set_neutral = yes
+							set_friendly = no
+						}
+					}
+				}
+			}
+			every_country = {
+				limit = {
+					is_country_type = enclave
+				}
+				set_faction_hostility = {
+					target = prev
+					set_hostile = no
+					set_neutral = yes
+					set_friendly = no
+				}
+			}
+			event_target:hfe_pirate_target = {
+				if = {
+					limit = {
+						has_event_chain = hfe_chain_pirate_count
+					}
+					add_event_chain_counter = {
+						event_chain = hfe_chain_pirate_count
+						counter = hfe_chain_pirate_count_clan
+						amount = 1
+					}
+				}
+			}
+			if = {
+				limit = {
+					has_global_flag = hfe_pirate_logs
+				}
+				log = "new pirate country spawned"
+			}
+		}
+	}
+}
+
+# for country, return 6 event targets of not same species
+hfe_effect_save_slave_target = {
+	every_owned_pop = {
+		limit = {
+			has_job = hfe_job_pirate_slave
+		}
+		if = {
+			limit = {
+				exists = event_target:hfe_slave_target_5
+			}
+		}
+		else_if = {
+			limit = {
+				not = {
+					exists = event_target:hfe_slave_target_0
+				}
+			}
+			save_event_target_as = hfe_slave_target_0
+		}
+		else_if = {
+			limit = {
+				nor = {
+					is_exact_same_species = event_target:hfe_slave_target_0
+					exists = event_target:hfe_slave_target_1
+				}
+			}
+			save_event_target_as = hfe_slave_target_1
+		}
+		else_if = {
+			limit = {
+				nor = {
+					is_exact_same_species = event_target:hfe_slave_target_0
+					is_exact_same_species = event_target:hfe_slave_target_1
+					exists = event_target:hfe_slave_target_2
+				}
+			}
+			save_event_target_as = hfe_slave_target_2
+		}
+		else_if = {
+			limit = {
+				nor = {
+					is_exact_same_species = event_target:hfe_slave_target_0
+					is_exact_same_species = event_target:hfe_slave_target_1
+					is_exact_same_species = event_target:hfe_slave_target_2
+					exists = event_target:hfe_slave_target_3
+				}
+			}
+			save_event_target_as = hfe_slave_target_3
+		}
+		else_if = {
+			limit = {
+				nor = {
+					is_exact_same_species = event_target:hfe_slave_target_0
+					is_exact_same_species = event_target:hfe_slave_target_1
+					is_exact_same_species = event_target:hfe_slave_target_2
+					is_exact_same_species = event_target:hfe_slave_target_3
+					exists = event_target:hfe_slave_target_4
+				}
+			}
+			save_event_target_as = hfe_slave_target_4
+		}
+		else_if = {
+			limit = {
+				nor = {
+					is_exact_same_species = event_target:hfe_slave_target_0
+					is_exact_same_species = event_target:hfe_slave_target_1
+					is_exact_same_species = event_target:hfe_slave_target_2
+					is_exact_same_species = event_target:hfe_slave_target_3
+					is_exact_same_species = event_target:hfe_slave_target_4
+					exists = event_target:hfe_slave_target_5
+				}
+			}
+			save_event_target_as = hfe_slave_target_5
+		}
+	}
+}
+
+# this planet, from bombarder
+hfe_effect_pirate_ravage_planet = {
+	solar_system = {
+		every_fleet_in_system = {
+			fleet_event = {
+				id = hfe_pirate.302
+			}
+		}
+	}
+	add_planet_devastation = 5
+	random_owned_pop = {
+		limit = {
+			is_sapient = yes
+		}
+		if = {
+			limit = {
+				has_trait = trait_hive_mind
+			}
+			kill_pop = yes
+		}
+		else = {
+			save_event_target_as = hfe_settle_pop_target
+		}
+	}
+	from = {
+		hfe_effect_pirate_resource_reward = yes
+		if = {
+			limit = {
+				exists = event_target:hfe_settle_pop_target
+			}
+			hfe_effect_settle_pop = yes
+			event_target:hfe_settle_pop_target = {
+				clear_pop_category = yes
+				if = {
+					limit = {
+						prev = {
+							is_ai = no
+						}
+					}
+					create_message = {
+						type = MESSAGE_TYPE_POP_ABDUCTED
+						localization = MESSAGE_POP_ABDUCTED
+						days = 10
+						target = prev
+						variable = {
+							type = name
+							localization = SPECIES
+							scope = species
+						}
+						variable = {
+							type = name
+							localization = PLANET
+							scope = root
+						}
+						variable = {
+							type = name
+							localization = TARGET_PLANET
+							scope = prevprev
+						}
+					}
+				}
+			}
+		}
+	}
+	add_modifier = {
+		modifier = hfe_pirate_ravaged_planet
+		days = @hfe_pirate_ravaged_planet_time
+	}
+	# owner may not exists at the point
+	if = {
+		limit = {
+			exists = owner
+		}
+		owner = {
+			if = {
+				limit = {
+					is_ai = no
+				}
+				if = {
+					limit = {
+						prev.from = {
+							is_country_type = hfe_pirate
+						}
+					}
+					create_message = {
+						type = hfe_message_type_pirate_raid
+						localization = hfe_message_type_pirate_raid_desc
+						days = 30
+						target = prev
+						variable = {
+							type = name
+							localization = planet
+							scope = prev
+						}
+						variable = {
+							type = name
+							localization = country
+							scope = prev.from
+						}
+					}
+					if = {
+						limit = {
+							has_event_chain = hfe_chain_pirate_count
+							from = {
+								is_country_type = hfe_pirate
+							}
+						}
+						add_event_chain_counter = {
+							event_chain = hfe_chain_pirate_count
+							counter = hfe_chain_pirate_count_planet_ravaged
+							amount = 1
+						}
+					}
+					else = {
+						create_message = {
+							type = MESSAGE_TYPE_POP_ABDUCTED_FROM_US
+							localization = MESSAGE_POP_ABDUCTED_FROM_US
+							days = 10
+							target = prev
+							variable = {
+								type = name
+								localization = SPECIES
+								scope = event_target:event_target:hfe_settle_pop_target.species
+							}
+							variable = {
+								type = name
+								localization = PLANET
+								scope = prev
+							}
+							variable = {
+								type = name
+								localization = ABDUCTER
+								scope = prev.from
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+hfe_effect_pirate_resource_reward = {
+	add_resource = {
+		minerals = 90
+		energy = 10
+		alloys = 10
+		physics_research = 5
+		society_research = 5
+		engineering_research = 5
+	}
+}
+
+hfe_effect_pirate_attack_count_check = {
+	if = {
+		limit = {
+			is_country_type = default
+		}
+		change_variable = {
+			which = hfe_pirate_attack_count
+			value = 1
+		}
+		if = {
+			limit = {
+				check_variable = {
+					which = hfe_pirate_attack_count
+					value > 20
+				}
+			}
+			set_variable = {
+				which = hfe_pirate_attack_count
+				value = 0
+			}
+			random_country = {
+				limit = {
+					has_country_flag = hfe_pirate_attack@prev
+					is_hostile = prev
+				}
+				save_event_target_as = hfe_pirate_country
+			}
+			if = {
+				limit = {
+					has_global_flag = hfe_pirate_logs
+				}
+				log = "fire effect hfe_effect_pirate_attack_count_check for \\[this.GetName] pirate is \\[hfe_pirate_country.GetName]"
+			}
+			country_event = {
+				id = hfe_pirate.200
+				days = 1
+				random = 30
+			}
+		}
+	}
+}
+
+# for country
+hfe_effect_pirate_flee_fleets = {
+	random_country = {
+		limit = {
+			is_country_type = hfe_pirate
+			not = {
+				is_country = prev
+			}
+		}
+		prev = {
+			every_owned_fleet = {
+				limit = {
+					is_ship_class = shipclass_military
+				}
+				set_owner = prevprev
+				if = {
+					limit = {
+						prev = {
+							not = {
+								is_country_type = hfe_pirate
+							}
+						}
+					}
+					log = "\\[this.GetName] flee to \\[owner.GetName] from \\[prev.GetName]"
+				}
+			}
+		}
+	}
+}
+
+# root fleet, this system
+# hfe_effect_pirate_path_get_next = {
+# 	if = {
+# 		limit = {
+# 			has_hyperlane_to = root.solar_system
+# 		}
+# 		if = {
+# 			limit = {
+# 				hfe_trigger_pirate_fleet_power_in_system_check = yes
+# 			}
+# 			save_event_target_as = hfe_pirate_fleet_target_system_next
+# 		}
+# 	}
+# 	else = {
+# 		root = {
+# 			closest_system = {
+# 				limit = {
+# 					not = {
+# 						has_star_flag = hfe_pirate_fleet_system_check@root
+# 					}
+# 					has_hyperlane_to = prevprev
+# 					hfe_trigger_pirate_fleet_power_in_system_check = yes
+# 				}
+# 				root = {
+# 				#	log = "looping warning"
+# 				}
+# 				set_timed_star_flag = {
+# 					flag = hfe_pirate_fleet_system_check@root
+# 					days = 1
+# 				}
+# 				hfe_effect_pirate_path_get_next = yes
+# 			}
+# 		}
+# 	}
+# }
+hfe_effect_pirate_path_get_next = {
+	if = {
+		limit = {
+			has_hyperlane_to = root.solar_system
+		}
+		if = {
+			limit = {
+				hfe_trigger_pirate_fleet_power_in_system_check = yes
+			}
+			save_event_target_as = hfe_pirate_fleet_target_system_next
+		}
+	}
+	else = {
+		root = {
+			closest_system = {
+				limit = {
+					not = {
+						has_star_flag = hfe_pirate_fleet_system_check@root
+					}
+					has_hyperlane_to = prevprev
+					hfe_trigger_pirate_fleet_power_in_system_check = yes
+				}
+				max_steps = 10
+				set_timed_star_flag = {
+					flag = hfe_pirate_fleet_system_check@root
+					days = 1
+				}
+				if = {
+					limit = {
+						has_hyperlane_to = root.solar_system
+					}
+					if = {
+						limit = {
+							hfe_trigger_pirate_fleet_power_in_system_check = yes
+						}
+						save_event_target_as = hfe_pirate_fleet_target_system_next
+					}
+				}
+				else = {
+					root = {
+						closest_system = {
+							limit = {
+								not = {
+									has_star_flag = hfe_pirate_fleet_system_check@root
+								}
+								has_hyperlane_to = prevprev
+								hfe_trigger_pirate_fleet_power_in_system_check = yes
+							}
+							max_steps = 9
+							set_timed_star_flag = {
+								flag = hfe_pirate_fleet_system_check@root
+								days = 1
+							}
+							if = {
+								limit = {
+									has_hyperlane_to = root.solar_system
+								}
+								if = {
+									limit = {
+										hfe_trigger_pirate_fleet_power_in_system_check = yes
+									}
+									save_event_target_as = hfe_pirate_fleet_target_system_next
+								}
+							}
+							else = {
+								root = {
+									closest_system = {
+										limit = {
+											not = {
+												has_star_flag = hfe_pirate_fleet_system_check@root
+											}
+											has_hyperlane_to = prevprev
+											hfe_trigger_pirate_fleet_power_in_system_check = yes
+										}
+										max_steps = 8
+										set_timed_star_flag = {
+											flag = hfe_pirate_fleet_system_check@root
+											days = 1
+										}
+										if = {
+											limit = {
+												has_hyperlane_to = root.solar_system
+											}
+											if = {
+												limit = {
+													hfe_trigger_pirate_fleet_power_in_system_check = yes
+												}
+												save_event_target_as = hfe_pirate_fleet_target_system_next
+											}
+										}
+										else = {
+											root = {
+												closest_system = {
+													limit = {
+														not = {
+															has_star_flag = hfe_pirate_fleet_system_check@root
+														}
+														has_hyperlane_to = prevprev
+														hfe_trigger_pirate_fleet_power_in_system_check = yes
+													}
+													max_steps = 7
+													set_timed_star_flag = {
+														flag = hfe_pirate_fleet_system_check@root
+														days = 1
+													}
+													if = {
+														limit = {
+															has_hyperlane_to = root.solar_system
+														}
+														if = {
+															limit = {
+																hfe_trigger_pirate_fleet_power_in_system_check = yes
+															}
+															save_event_target_as = hfe_pirate_fleet_target_system_next
+														}
+													}
+													else = {
+														root = {
+															closest_system = {
+																limit = {
+																	not = {
+																		has_star_flag = hfe_pirate_fleet_system_check@root
+																	}
+																	has_hyperlane_to = prevprev
+																	hfe_trigger_pirate_fleet_power_in_system_check = yes
+																}
+																max_steps = 6
+																set_timed_star_flag = {
+																	flag = hfe_pirate_fleet_system_check@root
+																	days = 1
+																}
+																if = {
+																	limit = {
+																		has_hyperlane_to = root.solar_system
+																	}
+																	if = {
+																		limit = {
+																			hfe_trigger_pirate_fleet_power_in_system_check = yes
+																		}
+																		save_event_target_as = hfe_pirate_fleet_target_system_next
+																	}
+																}
+																else = {
+																	root = {
+																		closest_system = {
+																			limit = {
+																				not = {
+																					has_star_flag = hfe_pirate_fleet_system_check@root
+																				}
+																				has_hyperlane_to = prevprev
+																				hfe_trigger_pirate_fleet_power_in_system_check = yes
+																			}
+																			max_steps = 5
+																			set_timed_star_flag = {
+																				flag = hfe_pirate_fleet_system_check@root
+																				days = 1
+																			}
+																			if = {
+																				limit = {
+																					has_hyperlane_to = root.solar_system
+																				}
+																				if = {
+																					limit = {
+																						hfe_trigger_pirate_fleet_power_in_system_check = yes
+																					}
+																					save_event_target_as = hfe_pirate_fleet_target_system_next
+																				}
+																			}
+																			else = {
+																				root = {
+																					closest_system = {
+																						limit = {
+																							not = {
+																								has_star_flag = hfe_pirate_fleet_system_check@root
+																							}
+																							has_hyperlane_to = prevprev
+																							hfe_trigger_pirate_fleet_power_in_system_check = yes
+																						}
+																						max_steps = 4
+																						set_timed_star_flag = {
+																							flag = hfe_pirate_fleet_system_check@root
+																							days = 1
+																						}
+																						if = {
+																							limit = {
+																								has_hyperlane_to = root.solar_system
+																							}
+																							if = {
+																								limit = {
+																									hfe_trigger_pirate_fleet_power_in_system_check = yes
+																								}
+																								save_event_target_as = hfe_pirate_fleet_target_system_next
+																							}
+																						}
+																						else = {
+																							root = {
+																								closest_system = {
+																									limit = {
+																										not = {
+																											has_star_flag = hfe_pirate_fleet_system_check@root
+																										}
+																										has_hyperlane_to = prevprev
+																										hfe_trigger_pirate_fleet_power_in_system_check = yes
+																									}
+																									max_steps = 4
+																									set_timed_star_flag = {
+																										flag = hfe_pirate_fleet_system_check@root
+																										days = 1
+																									}
+																									if = {
+																										limit = {
+																											has_hyperlane_to = root.solar_system
+																										}
+																										if = {
+																											limit = {
+																												hfe_trigger_pirate_fleet_power_in_system_check = yes
+																											}
+																											save_event_target_as = hfe_pirate_fleet_target_system_next
+																										}
+																									}
+																									else = {
+																										root = {
+																											closest_system = {
+																												limit = {
+																													not = {
+																														has_star_flag = hfe_pirate_fleet_system_check@root
+																													}
+																													has_hyperlane_to = prevprev
+																													hfe_trigger_pirate_fleet_power_in_system_check = yes
+																												}
+																												max_steps = 3
+																												set_timed_star_flag = {
+																													flag = hfe_pirate_fleet_system_check@root
+																													days = 1
+																												}
+																												if = {
+																													limit = {
+																														has_hyperlane_to = root.solar_system
+																													}
+																													if = {
+																														limit = {
+																															hfe_trigger_pirate_fleet_power_in_system_check = yes
+																														}
+																														save_event_target_as = hfe_pirate_fleet_target_system_next
+																													}
+																												}
+																												else = {
+																													root = {
+																														closest_system = {
+																															limit = {
+																																not = {
+																																	has_star_flag = hfe_pirate_fleet_system_check@root
+																																}
+																																has_hyperlane_to = prevprev
+																																hfe_trigger_pirate_fleet_power_in_system_check = yes
+																															}
+																															max_steps = 2
+																															set_timed_star_flag = {
+																																flag = hfe_pirate_fleet_system_check@root
+																																days = 1
+																															}
+																															if = {
+																																limit = {
+																																	has_hyperlane_to = root.solar_system
+																																}
+																																if = {
+																																	limit = {
+																																		hfe_trigger_pirate_fleet_power_in_system_check = yes
+																																	}
+																																	save_event_target_as = hfe_pirate_fleet_target_system_next
+																																}
+																															}
+																															else = {
+																																root = {
+																																	closest_system = {
+																																		limit = {
+																																			not = {
+																																				has_star_flag = hfe_pirate_fleet_system_check@root
+																																			}
+																																			has_hyperlane_to = prevprev
+																																			hfe_trigger_pirate_fleet_power_in_system_check = yes
+																																		}
+																																		max_steps = 1
+																																		set_timed_star_flag = {
+																																			flag = hfe_pirate_fleet_system_check@root
+																																			days = 1
+																																		}
+																																		save_event_target_as = hfe_pirate_fleet_target_system_next
+																																	}
+																																}
+																															}
+																														}
+																													}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+hfe_effect_pirate_path_target_home = {
+	if = {
+		limit = {
+			solar_system = {
+				exists = owner
+				owner = {
+					not = {
+						is_country = root.owner
+					}
+				}
+			}
+		}
+		closest_system = {
+			limit = {
+				exists = owner
+				owner = {
+					is_country = root.owner
+				}
+				# heavy check to the end
+				hfe_trigger_pirate_fleet_power_in_system_check = yes
+				hfe_trigger_pirate_path_check = yes
+			}
+			root = {
+				set_timed_fleet_flag = {
+					flag = hfe_pirate_fleet_target_system@prev
+					days = 365
+				}
+				set_timed_fleet_flag = {
+					flag = hfe_pirate_fleet_has_target
+					days = 365
+				}
+			}
+		}
+	}
+}
+
+hfe_effect_pirate_path_target_planet = {
+	solar_system = {
+		if = {
+			limit = {
+				exists = solar_system.starbase.owner
+				exists = solar_system.starbase.fleet
+				solar_system.starbase.owner = {
+					is_hostile = root.owner
+				}
+				solar_system.starbase.fleet = {
+					has_hp_percentage > 0.9
+				}
+			}
+			root = {
+				if = {
+					limit = {
+						has_fleet_flag = hfe_pirate_log_fleet
+					}
+					log = "\\[this.GetName] will suppress starbase of \\[solar_system.GetName]"
+				}
+				set_fleet_flag = hfe_pirate_fleet_move_to_target
+				clear_fleet_actions = this
+				clear_orders = yes
+				queue_actions = {
+					find_closest_planet = {
+						trigger = {
+							id = hfe_pirate.trigger.0
+							is_same_value = prevprev.system_star
+						}
+						found_planet = {
+							move_to = this
+						}
+					}
+				}
+				# auto_move_to_planet = {
+				# target = prev.system_star
+				# clear_auto_move_on_arrival = yes
+				# }
+			}
+		}
+		else = {
+			random_system_planet = {
+				limit = {
+					exists = controller
+					controller = {
+						is_hostile = root.owner
+					}
+					or = {
+						has_mining_station = yes
+						has_research_station = yes
+						and = {
+							num_pops > 0
+							not = {
+								has_modifier = hfe_pirate_ravaged_planet
+							}
+						}
+					}
+				}
+				weights = {
+					base = 10
+					modifier = {
+						factor = 100
+						not = {
+							exists = owner
+						}
+					}
+				}
+				root = {
+					if = {
+						limit = {
+							has_fleet_flag = hfe_pirate_log_fleet
+						}
+						log = "\\[this.GetName] wants to plunder \\[prev.GetName]"
+					}
+					set_fleet_flag = hfe_pirate_fleet_move_to_target
+					clear_fleet_actions = this
+					clear_orders = yes
+					queue_actions = {
+						find_closest_planet = {
+							trigger = {
+								id = hfe_pirate.trigger.1
+								is_planet = prevprev
+							}
+							found_planet = {
+								orbit_planet = this
+								repeat = {
+									while = {
+										id = hfe_pirate.trigger.1.1
+										exists = owner
+										owner = {
+											is_hostile = root.owner
+										}
+										num_pops > 1
+										# idk neeed it or not, need to test later
+										not = {
+											has_modifier = hfe_pirate_ravaged_planet
+										}
+									}
+									# ai will disturb fleet if it just wait, so move every day to planet to bomb it
+									#wait = 30
+									orbit_planet = this
+								}
+							}
+						}
+					}
+					# if = {
+					# limit = {
+					# prev = {
+					# num_pops > 0
+					# }
+					# }
+					# hfe_effect_pirate_path_fleet_clear_actions = yes
+					# auto_move_to_planet = {
+					# target = prev
+					# clear_auto_move_on_arrival = no
+					# }
+					# }
+					# else = {
+					# hfe_effect_pirate_path_fleet_clear_actions = yes
+					# auto_move_to_planet = {
+					# target = prev
+					# clear_auto_move_on_arrival = yes
+					# }
+					# }
+				}
+			}
+		}
+	}
+}
+
+hfe_effect_pirate_path_target_system = {
+	random_list = {
+		# go home
+		50 = {
+			modifier = {
+				factor = 0
+				has_hp_percentage > 0.95
+				num_ships > 5
+			}
+			modifier = {
+				factor = 2
+				has_hp_percentage < 0.9
+			}
+			modifier = {
+				factor = 2
+				has_hp_percentage < 0.8
+			}
+			if = {
+				limit = {
+					has_fleet_flag = hfe_pirate_log_fleet
+				}
+				log = "\\[this.GetName] in \\[solar_system.GetName] go home system"
+			}
+			hfe_effect_pirate_path_target_home = yes
+		}
+		# move ahead
+		100 = {
+			modifier = {
+				factor = 0
+				or = {
+					num_ships <= 5
+					has_hp_percentage < 0.7
+				}
+			}
+			if = {
+				limit = {
+					has_fleet_flag = hfe_pirate_log_fleet
+				}
+				log = "\\[this.GetName] in \\[solar_system.GetName] try to find system target"
+			}
+			closest_system = {
+				limit = {
+					exists = owner
+					owner = {
+						has_opinion_modifier = {
+							who = root.owner
+							modifier = hfe_opinion_pirate_prior_target
+						}
+					}
+					# heavy check to the end
+					hfe_trigger_pirate_fleet_power_in_system_check = yes
+					hfe_trigger_pirate_path_check = yes
+				}
+				max_steps = 10
+				root = {
+					if = {
+						limit = {
+							has_fleet_flag = hfe_pirate_log_fleet
+						}
+						log = "\\[this.GetName] in \\[solar_system.GetName] find prior target, it is \\[prev.GetName]"
+					}
+					set_timed_fleet_flag = {
+						flag = hfe_pirate_fleet_target_system@prev
+						days = 365
+					}
+					set_timed_fleet_flag = {
+						flag = hfe_pirate_fleet_has_target
+						days = 365
+					}
+				}
+			}
+			# try to find planet
+			if = {
+				limit = {
+					not = {
+						has_fleet_flag = hfe_pirate_fleet_has_target
+					}
+				}
+				closest_system = {
+					limit = {
+						#exists = owner
+						any_system_planet = {
+							exists = owner
+							owner = {
+								is_hostile = root.owner
+							}
+							num_pops > 1
+							has_orbital_bombardment = no
+						}
+						# heavy check to the end
+						hfe_trigger_pirate_fleet_power_in_system_check = yes
+						hfe_trigger_pirate_path_check = yes
+					}
+					max_steps = 10
+					root = {
+						if = {
+							limit = {
+								has_fleet_flag = hfe_pirate_log_fleet
+							}
+							log = "\\[this.GetName] in \\[solar_system.GetName] find target with planet, it is \\[prev.GetName]"
+						}
+						set_timed_fleet_flag = {
+							flag = hfe_pirate_fleet_target_system@prev
+							days = 365
+						}
+						set_timed_fleet_flag = {
+							flag = hfe_pirate_fleet_has_target
+							days = 365
+						}
+					}
+				}
+			}
+			if = {
+				limit = {
+					not = {
+						has_fleet_flag = hfe_pirate_fleet_has_target
+					}
+				}
+				closest_system = {
+					limit = {
+						exists = owner
+						owner = {
+							is_hostile = root.owner
+						}
+						any_system_planet = {
+							exists = controller
+							controller = {
+								is_hostile = root.owner
+							}
+							or = {
+								has_mining_station = yes
+								has_research_station = yes
+							}
+						}
+						# heavy check to the end
+						hfe_trigger_pirate_fleet_power_in_system_check = yes
+						hfe_trigger_pirate_path_check = yes
+					}
+					max_steps = 10
+					root = {
+						if = {
+							limit = {
+								has_fleet_flag = hfe_pirate_log_fleet
+							}
+							log = "\\[this.GetName] in \\[solar_system.GetName] find target with mining, it is \\[prev.GetName]"
+						}
+						set_timed_fleet_flag = {
+							flag = hfe_pirate_fleet_target_system@prev
+							days = 365
+						}
+						set_timed_fleet_flag = {
+							flag = hfe_pirate_fleet_has_target
+							days = 365
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+hfe_effect_pirate_path_go_to_next = {
+	if = {
+		limit = {
+			not = {
+				has_fleet_flag = hfe_pirate_fleet_move_to_target
+			}
+		}
+		if = {
+			limit = {
+				not = {
+					has_fleet_flag = hfe_pirate_fleet_has_target
+				}
+			}
+			hfe_effect_pirate_path_target_system = yes
+		}
+		closest_system = {
+			limit = {
+				root = {
+					has_fleet_flag = hfe_pirate_fleet_target_system@prev
+				}
+			}
+			hfe_effect_pirate_path_get_next = yes
+			# closest_system = {
+			# 	limit = {
+			# 		has_hyperlane_to = root.solar_system
+			# 		hfe_trigger_pirate_fleet_power_in_system_check = yes
+			# 	}
+			# 	save_event_target_as = hfe_pirate_fleet_target_system_next
+			# }
+		}
+		if = {
+			limit = {
+				exists = event_target:hfe_pirate_fleet_target_system_next
+			}
+			set_fleet_flag = hfe_pirate_fleet_move_to_target
+			if = {
+				limit = {
+					has_fleet_flag = hfe_pirate_log_fleet
+				}
+				log = "\\[this.GetName] move to \\[hfe_pirate_fleet_target_system_next.GetName]"
+			}
+			clear_fleet_actions = this
+			clear_orders = yes
+			queue_actions = {
+				find_closest_system = {
+					trigger = {
+						id = hfe_pirate.trigger.2
+						is_same_value = event_target:hfe_pirate_fleet_target_system_next
+					}
+					found_system = {
+						move_to = this
+					}
+				}
+			}
+			# auto_move_to_planet = {
+			# target = event_target:hfe_pirate_fleet_target_system_next.system_star
+			# clear_auto_move_on_arrival = yes
+			# }
+		}
+		# next system not exists, remove target
+		else = {
+			owner = {
+				set_timed_country_flag = {
+					flag = hfe_pirate_prior_hunting_target
+					days = 700
+				}
+			}
+			if = {
+				limit = {
+					has_fleet_flag = hfe_pirate_log_fleet
+				}
+				log = "\\[this.GetName] in \\[solar_system.GetName] target not find, wait 180 days"
+			}
+			hfe_effect_pirate_path_fleet_reset = yes
+			if = {
+				limit = {
+					not = {
+						has_fleet_flag = hfe_pirate_fleet_rest
+					}
+				}
+				set_timed_fleet_flag = {
+					flag = hfe_pirate_fleet_rest
+					days = 179
+				}
+				# fleet_event = {
+				# id = hfe_pirate.300
+				# days = 180
+				# }
+			}
+		}
+	}
+}
+
+hfe_effect_pirate_path_fleet_reset = {
+	clear_fleet_actions = this
+	clear_orders = yes
+	remove_fleet_flag = hfe_pirate_fleet_move_to_target
+	remove_fleet_flag = hfe_pirate_fleet_has_target
+	closest_system = {
+		limit = {
+			prev = {
+				has_fleet_flag = hfe_pirate_fleet_target_system@prev
+			}
+		}
+		prev = {
+			remove_fleet_flag = hfe_pirate_fleet_target_system@prev
+		}
+	}
+}
+
+hfe_effect_pirate_set_building_flag = {
+	# building_pirate_fraud
+	random_list = {
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.0
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.1
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.2
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.3
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.4
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.5
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.6
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.7
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.8
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.9
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.10
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.11
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.12
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.13
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.14
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.15
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.16
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_fraud.17
+				days = 30
+			}
+		}
+	}
+	# building_pirate_blackmail
+	random_list = {
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.0
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.1
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.2
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.3
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.4
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.5
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.6
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.7
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.8
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.9
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.10
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_blackmail.11
+				days = 30
+			}
+		}
+	}
+	# building_pirate_abductions
+	random_list = {
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.0
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.1
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.2
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.3
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.4
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.5
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.6
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.7
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.8
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.9
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.10
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.11
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.12
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.13
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.14
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.15
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.16
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.17
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.18
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.19
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.20
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_abductions.21
+				days = 30
+			}
+		}
+	}
+	# building_pirate_killings
+	random_list = {
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.0
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.1
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.2
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.3
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.4
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.5
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.6
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.7
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.8
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.9
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.10
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.11
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.12
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.13
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.14
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.15
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.16
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_killings.17
+				days = 30
+			}
+		}
+	}
+	# building_pirate_slave_trade
+	random_list = {
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.0
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.1
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.2
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.3
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.4
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.5
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.6
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.7
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.8
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.9
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.10
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.11
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.12
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.13
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.14
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.15
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.16
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.17
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.18
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.19
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.20
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.21
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_slave_trade.22
+				days = 30
+			}
+		}
+	}
+	# building_pirate_trade
+	random_list = {
+		11 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.0
+				days = 30
+			}
+		}
+		10 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.1
+				days = 30
+			}
+		}
+		10 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.2
+				days = 30
+			}
+		}
+		10 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.3
+				days = 30
+			}
+		}
+		10 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.4
+				days = 30
+			}
+		}
+		10 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.5
+				days = 30
+			}
+		}
+		9 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.6
+				days = 30
+			}
+		}
+		9 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.7
+				days = 30
+			}
+		}
+		9 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.8
+				days = 30
+			}
+		}
+		9 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.9
+				days = 30
+			}
+		}
+		9 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.10
+				days = 30
+			}
+		}
+		8 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.11
+				days = 30
+			}
+		}
+		8 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.12
+				days = 30
+			}
+		}
+		8 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.13
+				days = 30
+			}
+		}
+		8 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.14
+				days = 30
+			}
+		}
+		8 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.15
+				days = 30
+			}
+		}
+		7 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.16
+				days = 30
+			}
+		}
+		7 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.17
+				days = 30
+			}
+		}
+		7 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.18
+				days = 30
+			}
+		}
+		7 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.19
+				days = 30
+			}
+		}
+		7 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.20
+				days = 30
+			}
+		}
+		6 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.21
+				days = 30
+			}
+		}
+		6 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.22
+				days = 30
+			}
+		}
+		6 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.23
+				days = 30
+			}
+		}
+		6 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.24
+				days = 30
+			}
+		}
+		6 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.25
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.26
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.27
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.28
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.29
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.30
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.31
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.32
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.33
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.34
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.35
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.36
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.37
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.38
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.39
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.40
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.41
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.42
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.43
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.44
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.45
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.46
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.47
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.48
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_trade.49
+				days = 30
+			}
+		}
+	}
+	# building_pirate_research
+	random_list = {
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.0
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.1
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.2
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.3
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.4
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.5
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.6
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.7
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.8
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.9
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.10
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.11
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.12
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.13
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.14
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.15
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.16
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.17
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.18
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.19
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_research.20
+				days = 30
+			}
+		}
+	}
+	# building_pirate_data_trade
+	random_list = {
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.0
+				days = 30
+			}
+		}
+		5 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.1
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.2
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.3
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.4
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.5
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.6
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.7
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.8
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.9
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.10
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.11
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.12
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.13
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.14
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.15
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.16
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.17
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.18
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.19
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_data_trade.20
+				days = 30
+			}
+		}
+	}
+	# building_pirate_arms_trade
+	random_list = {
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.0
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.1
+				days = 30
+			}
+		}
+		4 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.2
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.3
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.4
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.5
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.6
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.7
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.8
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.9
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.10
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.11
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.12
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.13
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.14
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.15
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_arms_trade.16
+				days = 30
+			}
+		}
+	}
+	# building_pirate_space_pirating
+	random_list = {
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.0
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.1
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.2
+				days = 30
+			}
+		}
+		3 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.3
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.4
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.5
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.6
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.7
+				days = 30
+			}
+		}
+		2 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.8
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.9
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.10
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.11
+				days = 30
+			}
+		}
+		1 = {
+			set_timed_country_flag = {
+				flag = hfe_scripted_loc_building_pirate_space_pirating.12
+				days = 30
+			}
+		}
+	}
+}

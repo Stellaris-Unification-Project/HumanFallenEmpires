@@ -1,0 +1,1378 @@
+namespace = hfe_leaders
+# calc leaders capacity
+country_event = {
+	id = hfe_leaders.0
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_leaders_recrutment_enabled = yes
+		or = {
+			is_ai = no
+			is_country_type = default
+		}
+		any_pool_leader = {
+			always = yes
+		}
+	}
+	immediate = {
+		if = {
+			limit = {
+				not = {
+					has_modifier = hfe_leaders_started
+				}
+			}
+			add_modifier = {
+				modifier = hfe_leaders_started
+			}
+		}
+		hfe_leaders_calc_leaders_capacity = yes
+		if = {
+			limit = {
+				not = {
+					any_owned_leader = {
+						leader_class = governor
+					}
+				}
+			}
+			country_event = {
+				id = hfe_leaders.50
+			}
+		}
+		if = {
+			limit = {
+				not = {
+					any_owned_leader = {
+						leader_class = scientist
+						count = 4
+					}
+				}
+			}
+			country_event = {
+				id = hfe_leaders.51
+			}
+		}
+		if = {
+			limit = {
+				not = {
+					any_owned_leader = {
+						leader_class = admiral
+					}
+				}
+			}
+			country_event = {
+				id = hfe_leaders.52
+			}
+		}
+		if = {
+			limit = {
+				not = {
+					any_owned_leader = {
+						leader_class = general
+					}
+				}
+			}
+			country_event = {
+				id = hfe_leaders.53
+			}
+		}
+	}
+}
+
+# gain new trait from mod by on_leader_level_up
+country_event = {
+	id = hfe_leaders.1
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = from
+		hfe_trigger_leaders_traits_enabled = yes
+	}
+	immediate = {
+		if = {
+			limit = {
+				is_country_type = hfe_pirate
+				from = {
+					leader_class = admiral
+					not = {
+						has_trait = hfe_admiral_trait_pirate
+					}
+				}
+			}
+			from = {
+				add_trait = hfe_admiral_trait_pirate
+			}
+		}
+		from = {
+			if = {
+				limit = {
+					species = {
+						has_trait = trait_psionic
+					}
+				}
+				hfe_effect_add_psionic_trait = yes
+			}
+			add_leader_traits_after_modification = yes
+			if = {
+				limit = {
+					num_traits < 4
+				}
+				random_list = {
+					90 = {
+					}
+					10 = {
+						modifier = {
+							factor = 2
+							has_level > 3
+						}
+						modifier = {
+							factor = 2
+							has_level > 4
+						}
+						modifier = {
+							factor = 2
+							has_level > 5
+						}
+						hfe_effect_leaders_add_random_trait = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+# on actions hucks to generate leaders 10 - 50
+# governor
+# on_building_complete # on_blocker_cleared
+planet_event = {
+	id = hfe_leaders.10
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		hfe_trigger_leaders_recrutment_enabled = yes
+	}
+	immediate = {
+		random_list = {
+			20 = {
+			}
+			1 = {
+				owner = {
+					country_event = {
+						id = hfe_leaders.50
+					}
+				}
+			}
+		}
+	}
+}
+
+# on_building_upgraded
+planet_event = {
+	id = hfe_leaders.11
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		hfe_trigger_leaders_recrutment_enabled = yes
+	}
+	immediate = {
+		random_list = {
+			30 = {
+			}
+			1 = {
+				owner = {
+					country_event = {
+						id = hfe_leaders.50
+					}
+				}
+			}
+		}
+	}
+}
+
+# on_colonized
+planet_event = {
+	id = hfe_leaders.12
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		hfe_trigger_leaders_recrutment_enabled = yes
+	}
+	immediate = {
+		random_list = {
+			10 = {
+			}
+			1 = {
+				owner = {
+					country_event = {
+						id = hfe_leaders.50
+					}
+				}
+			}
+		}
+	}
+}
+
+# on_pop_grown on_pop_assembled
+planet_event = {
+	id = hfe_leaders.13
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		hfe_trigger_leaders_recrutment_enabled = yes
+	}
+	immediate = {
+		random_list = {
+			20 = {
+			}
+			1 = {
+				owner = {
+					country_event = {
+						id = hfe_leaders.50
+					}
+				}
+			}
+		}
+	}
+}
+
+# scientist
+# on_tech_increased
+country_event = {
+	id = hfe_leaders.20
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_leaders_recrutment_enabled = yes
+	}
+	immediate = {
+		random_list = {
+			10 = {
+			}
+			1 = {
+				country_event = {
+					id = hfe_leaders.51
+				}
+			}
+		}
+	}
+}
+
+# on_survey
+ship_event = {
+	id = hfe_leaders.21
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		hfe_trigger_leaders_recrutment_enabled = yes
+	}
+	immediate = {
+		random_list = {
+			30 = {
+			}
+			1 = {
+				owner = {
+					country_event = {
+						id = hfe_leaders.51
+					}
+				}
+			}
+		}
+	}
+}
+
+# admiral
+# on_fleet_destroyed_perp
+country_event = {
+	id = hfe_leaders.30
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_leaders_recrutment_enabled = yes
+		exists = fromfrom
+		fromfrom = {
+			is_ship_class = shipclass_military
+		}
+		exists = fromfromfrom
+		fromfromfrom = {
+			is_ship_class = shipclass_military
+		}
+	}
+	immediate = {
+		random_list = {
+			10 = {
+			}
+			1 = {
+				country_event = {
+					id = hfe_leaders.52
+				}
+			}
+		}
+	}
+}
+
+# on_ship_built
+ship_event = {
+	id = hfe_leaders.31
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		hfe_trigger_leaders_recrutment_enabled = yes
+		is_ship_class = shipclass_military
+	}
+	immediate = {
+		random_list = {
+			30 = {
+			}
+			1 = {
+				owner = {
+					country_event = {
+						id = hfe_leaders.52
+					}
+				}
+			}
+		}
+	}
+}
+
+# gain general
+# on_planet_attackers_win on_planet_defenders_win
+country_event = {
+	id = hfe_leaders.40
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_leaders_recrutment_enabled = yes
+	}
+	immediate = {
+		random_list = {
+			5 = {
+			}
+			1 = {
+				country_event = {
+					id = hfe_leaders.53
+				}
+			}
+		}
+	}
+}
+
+# on_army_recruited
+planet_event = {
+	id = hfe_leaders.41
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_leaders_recrutment_enabled = yes
+	}
+	immediate = {
+		random_list = {
+			20 = {
+			}
+			1 = {
+				owner = {
+					country_event = {
+						id = hfe_leaders.53
+					}
+				}
+			}
+		}
+	}
+}
+
+# gain governor 50
+country_event = {
+	id = hfe_leaders.50
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		check_variable = {
+			which = hfe_leaders_governor_capacity
+			value > 0
+		}
+	}
+	immediate = {
+		random_pool_leader = {
+			limit = {
+				leader_class = governor
+			}
+			root = {
+				clone_leader = {
+					target = prev
+					class = governor
+				}
+			}
+			kill_leader = {
+				show_notification = no
+			}
+		}
+		change_variable = {
+			which = hfe_leaders_governor_capacity
+			value = -1
+		}
+		country_event = {
+			id = hfe_leaders.54
+		}
+	}
+}
+
+# gain scientist
+country_event = {
+	id = hfe_leaders.51
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		check_variable = {
+			which = hfe_leaders_scientist_capacity
+			value > 0
+		}
+	}
+	immediate = {
+		random_pool_leader = {
+			limit = {
+				leader_class = scientist
+			}
+			root = {
+				clone_leader = {
+					target = prev
+					class = scientist
+				}
+			}
+			kill_leader = {
+				show_notification = no
+			}
+		}
+		change_variable = {
+			which = hfe_leaders_scientist_capacity
+			value = -1
+		}
+		country_event = {
+			id = hfe_leaders.55
+		}
+	}
+}
+
+# gain admiral
+country_event = {
+	id = hfe_leaders.52
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		check_variable = {
+			which = hfe_leaders_admiral_capacity
+			value > 0
+		}
+	}
+	immediate = {
+		random_pool_leader = {
+			limit = {
+				leader_class = admiral
+			}
+			root = {
+				clone_leader = {
+					target = prev
+					class = admiral
+				}
+			}
+			kill_leader = {
+				show_notification = no
+			}
+		}
+		change_variable = {
+			which = hfe_leaders_admiral_capacity
+			value = -1
+		}
+		country_event = {
+			id = hfe_leaders.56
+		}
+	}
+}
+
+# gain general
+country_event = {
+	id = hfe_leaders.53
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		check_variable = {
+			which = hfe_leaders_general_capacity
+			value > 0
+		}
+	}
+	immediate = {
+		#log = "hfe_leaders.53"
+		random_pool_leader = {
+			limit = {
+				leader_class = general
+			}
+			root = {
+				clone_leader = {
+					target = prev
+					class = general
+				}
+			}
+			kill_leader = {
+				show_notification = no
+			}
+		}
+		change_variable = {
+			which = hfe_leaders_general_capacity
+			value = -1
+		}
+		country_event = {
+			id = hfe_leaders.57
+		}
+	}
+}
+
+# notifications
+# governor
+country_event = {
+	id = hfe_leaders.54
+	title = hfe_leaders.54.name
+	desc = hfe_leaders.54.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+	trigger = {
+		is_ai = no
+		not = {
+			has_country_flag = hfe_leaders.54_block
+		}
+	}
+	option = {
+		name = INTERESTING
+	}
+	option = {
+		name = hfe_block
+		custom_tooltip = hfe_leaders_block.tooltip
+		hidden_effect = {
+			set_country_flag = hfe_leaders.54_block
+		}
+	}
+}
+
+# scientist
+country_event = {
+	id = hfe_leaders.55
+	title = hfe_leaders.55.name
+	desc = hfe_leaders.55.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+	trigger = {
+		is_ai = no
+		not = {
+			has_country_flag = hfe_leaders.55_block
+		}
+	}
+	option = {
+		name = INTERESTING
+	}
+	option = {
+		name = hfe_block
+		custom_tooltip = hfe_leaders_block.tooltip
+		hidden_effect = {
+			set_country_flag = hfe_leaders.55_block
+		}
+	}
+}
+
+# admiral
+country_event = {
+	id = hfe_leaders.56
+	title = hfe_leaders.56.name
+	desc = hfe_leaders.56.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+	trigger = {
+		is_ai = no
+		not = {
+			has_country_flag = hfe_leaders.56_block
+		}
+	}
+	option = {
+		name = INTERESTING
+	}
+	option = {
+		name = hfe_block
+		custom_tooltip = hfe_leaders_block.tooltip
+		hidden_effect = {
+			set_country_flag = hfe_leaders.56_block
+		}
+	}
+}
+
+# general
+country_event = {
+	id = hfe_leaders.57
+	title = hfe_leaders.57.name
+	desc = hfe_leaders.57.desc
+	picture = GFX_evt_galactic_senate
+	show_sound = event_administrative_work
+	is_triggered_only = yes
+	trigger = {
+		is_ai = no
+		not = {
+			has_country_flag = hfe_leaders.57_block
+		}
+	}
+	option = {
+		name = INTERESTING
+	}
+	option = {
+		name = hfe_block
+		custom_tooltip = hfe_leaders_block.tooltip
+		hidden_effect = {
+			set_country_flag = hfe_leaders.57_block
+		}
+	}
+}
+
+# leader trait features 100 - 200
+# terraforming ruler reward on_terraforming_complete
+planet_event = {
+	id = hfe_leaders.100
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = solar_system.owner.ruler
+		solar_system.owner.ruler = {
+			has_trait = hfe_ruler_trait_terraforming
+		}
+		not = {
+			has_planet_flag = hfe_leaders.100_block
+		}
+		# is_terraformed = no # todo test it
+	}
+	immediate = {
+		set_planet_flag = hfe_leaders.100_block
+		solar_system.owner = {
+			add_monthly_resource_mult = {
+				resource = society_research
+				value = 2
+			}
+		}
+	}
+}
+
+# transcendent trait change
+country_event = {
+	id = hfe_leaders.101
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = ruler
+		ruler = {
+			or = {
+				has_trait = hfe_ruler_trait_transcendent_0
+				has_trait = hfe_ruler_trait_transcendent_1
+				has_trait = hfe_ruler_trait_transcendent_2
+				has_trait = hfe_ruler_trait_transcendent_3
+				has_trait = hfe_ruler_trait_transcendent_4
+				has_trait = hfe_ruler_trait_transcendent_5
+				has_trait = hfe_ruler_trait_transcendent_6
+				has_trait = hfe_ruler_trait_transcendent_7
+				has_trait = hfe_ruler_trait_transcendent_8
+				has_trait = hfe_ruler_trait_transcendent_9
+				has_trait = hfe_ruler_trait_transcendent_10
+			}
+		}
+	}
+	immediate = {
+		ruler = {
+			remove_trait = hfe_ruler_trait_transcendent_0
+			remove_trait = hfe_ruler_trait_transcendent_1
+			remove_trait = hfe_ruler_trait_transcendent_2
+			remove_trait = hfe_ruler_trait_transcendent_3
+			remove_trait = hfe_ruler_trait_transcendent_4
+			remove_trait = hfe_ruler_trait_transcendent_5
+			remove_trait = hfe_ruler_trait_transcendent_6
+			remove_trait = hfe_ruler_trait_transcendent_7
+			remove_trait = hfe_ruler_trait_transcendent_8
+			remove_trait = hfe_ruler_trait_transcendent_9
+			remove_trait = hfe_ruler_trait_transcendent_10
+		}
+		if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 1
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_10
+			}
+		}
+		else_if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 0.9
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_9
+			}
+		}
+		else_if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 0.8
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_8
+			}
+		}
+		else_if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 0.7
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_7
+			}
+		}
+		else_if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 0.6
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_6
+			}
+		}
+		else_if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 0.5
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_5
+			}
+		}
+		else_if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 0.4
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_4
+			}
+		}
+		else_if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 0.3
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_3
+			}
+		}
+		else_if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 0.2
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_2
+			}
+		}
+		else_if = {
+			limit = {
+				pop_percentage = {
+					percentage >= 0.1
+					limit = {
+						has_ethic = ethic_spiritualist
+					}
+				}
+			}
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_1
+			}
+		}
+		else = {
+			ruler = {
+				add_trait = hfe_ruler_trait_transcendent_0
+			}
+		}
+	}
+}
+
+# teachable lvl up
+# on_planet_attackers_win on_planet_defenders_win
+country_event = {
+	id = hfe_leaders.102
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		fromfrom = {
+			planet_event = {
+				id = hfe_leaders.103
+				days = 2
+			}
+		}
+		if = {
+			limit = {
+				exists = ruler
+				ruler = {
+					has_trait = hfe_ruler_trait_army_lover
+				}
+			}
+			add_modifier = {
+				modifier = hfe_leaders_army_lover
+				days = 365
+			}
+		}
+	}
+}
+
+planet_event = {
+	id = hfe_leaders.103
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		random_planet_army = {
+			limit = {
+				exists = leader
+				leader = {
+					hfe_trigger_leaders_has_teachable = yes
+				}
+			}
+			leader = {
+				hfe_effect_leaders_teachable_lvl_up = yes
+			}
+		}
+		solar_system = {
+			random_fleet_in_system = {
+				limit = {
+					exists = leader
+					leader = {
+						hfe_trigger_leaders_has_teachable = yes
+					}
+				}
+				leader = {
+					hfe_effect_leaders_teachable_lvl_up = yes
+				}
+			}
+		}
+	}
+}
+
+# a new leader is generated for an empire. to be available for recruitment
+# scope: country. from: leader
+# on_leader_spawned
+# fixing leaders traits
+country_event = {
+	id = hfe_leaders.104
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = from
+		exists = from.species
+	}
+	immediate = {
+		from = {
+			if = {
+				limit = {
+					leader_class = admiral
+					species = {
+						has_trait = hfe_species_trait_dolphin
+					}
+				}
+				add_trait = hfe_admiral_trait_dolphin
+			}
+			if = {
+				limit = {
+					leader_class = admiral
+					root = {
+						or = {
+							has_country_flag = hfe_future
+							and = {
+								exists = event_target:hfe_coalition_leader
+								is_country = event_target:hfe_coalition_leader
+							}
+						}
+					}
+				}
+				add_trait = hfe_admiral_trait_future_train
+			}
+		}
+		# civic bonus
+		if = {
+			limit = {
+				has_valid_civic = hfe_civic_features_designed_aristocracy
+			}
+			from = {
+				hfe_effect_features_designed_aristocracy = yes
+			}
+		}
+	}
+}
+
+# This = owner of fleet 1 (winner)
+# From = owner of fleet 2 (loser)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+# on_space_battle_won
+# add afraid demons trait then win dementional horror
+country_event = {
+	id = hfe_leaders.105
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = from
+		from = {
+			is_country_type = guardian_horror
+		}
+		exists = fromfrom.leader
+	}
+	immediate = {
+		random = {
+			chance = 10
+			fromfrom.leader = {
+				add_trait = hfe_admiral_trait_afraid_demons
+			}
+			country_event = {
+				id = hfe_leaders.106
+				days = 1
+			}
+		}
+	}
+}
+
+# notification
+country_event = {
+	id = hfe_leaders.106
+	title = hfe_leaders.106.name
+	desc = hfe_leaders.106.desc
+	picture = GFX_evt_hfe_dimensional_horror
+	show_sound = event_mystic_reveal
+	location = fromfromfrom
+	is_triggered_only = yes
+	trigger = {
+		exists = fromfromfrom.leader
+	}
+	option = {
+		name = hfe_leaders.106.0
+		tooltip = {
+			fromfromfrom.leader = {
+				add_trait = hfe_admiral_trait_afraid_demons
+			}
+		}
+	}
+}
+
+# admiral satanist can kill retreating admiral
+# on_space_battle_won
+# This = owner of fleet 1 (winner)
+# From = owner of fleet 2 (loser)
+# FromFrom = fleet 1
+# FromFromFrom = fleet 2
+country_event = {
+	id = hfe_leaders.107
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = fromfromfrom.leader
+		exists = fromfrom.leader
+		fromfrom.leader = {
+			has_trait = hfe_admiral_trait_satanist
+		}
+	}
+	immediate = {
+		random_list = {
+			70 = {
+			}
+			30 = {
+				fromfromfrom = {
+					kill_leader = {
+						show_notification = yes
+					}
+				}
+			}
+		}
+	}
+}
+
+# notifications?
+# scientist satanist can generate tech
+# on_tech_increased
+country_event = {
+	id = hfe_leaders.108
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		any_owned_leader = {
+			has_trait = hfe_scientist_trait_satanist
+			or = {
+				is_researching_area = physics
+				is_researching_area = engineering
+				is_researching_area = society
+			}
+		}
+	}
+	immediate = {
+		random_list = {
+			95 = {
+			}
+			5 = {
+				hfe_effect_give_random_tech = yes
+			}
+		}
+	}
+}
+
+# warcrime tourism
+# on_war_beginning on_war_ended
+country_event = {
+	id = hfe_leaders.109
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		if = {
+			limit = {
+				exists = ruler
+				ruler = {
+					has_trait = hfe_ruler_trait_warcrime_tourism
+				}
+				is_at_war = yes
+			}
+			every_relation = {
+				limit = {
+					num_pops > 0
+					hfe_trigger_is_awake = yes
+					is_at_war = no
+					or = {
+						trust = {
+							who = root
+							value >= 50
+						}
+						# should be pirate
+						is_forced_friendly = root
+					}
+				}
+				if = {
+					limit = {
+						is_pacifist = yes
+					}
+					root = {
+						change_variable = {
+							which = hfe_leaders_warcrime_tourism
+							value = 0.5
+						}
+					}
+				}
+				else_if = {
+					limit = {
+						is_militarist = yes
+					}
+					root = {
+						change_variable = {
+							which = hfe_leaders_warcrime_tourism
+							value = 2
+						}
+					}
+				}
+				else = {
+					root = {
+						change_variable = {
+							which = hfe_leaders_warcrime_tourism
+							value = 1
+						}
+					}
+				}
+				# fallen bonus
+				if = {
+					limit = {
+						hfe_trigger_is_fallen = yes
+					}
+					root = {
+						change_variable = {
+							which = hfe_leaders_warcrime_tourism
+							value = 2
+						}
+					}
+				}
+			}
+			# remove_modifier = hfe_leaders_warcrime_tourism
+			add_modifier = {
+				modifier = hfe_leaders_warcrime_tourism
+				multiplier = hfe_leaders_warcrime_tourism
+				years = 5
+			}
+			clear_variable = hfe_leaders_warcrime_tourism
+		}
+		else = {
+			remove_modifier = hfe_leaders_warcrime_tourism
+		}
+	}
+}
+
+# refuge leaders
+country_event = {
+	id = hfe_leaders.110
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_leaders_enabled = yes
+		#		is_country_type = default
+		is_gestalt = no
+	}
+	immediate = {
+		remove_country_flag = hfe_pirate_spawned
+		every_owned_leader = {
+			random_list = {
+				# nothing
+				10 = {
+				}
+				# flee to friend
+				10 = {
+					save_event_target_as = hfe_leaders_refuge
+					root = {
+						random_relation = {
+							limit = {
+								hfe_trigger_is_awake = yes
+								num_pops > 0
+								not = {
+									has_policy_flag = refugees_not_allowed
+								}
+								or = {
+									has_policy_flag = refugees_allowed
+									event_target:hfe_leaders_refuge = {
+										has_citizenship_type = {
+											country = prev
+											type = citizenship_full
+										}
+									}
+								}
+								or = {
+									root = {
+										trust = {
+											who = prev
+											value >= 5
+										}
+									}
+									# for pirate
+									is_forced_friendly = root
+									# comment out for now, used in pirate branch
+									# has_country_flag = hfe_leaders_refuge@root
+								}
+							}
+							weights = {
+								base = 1
+								modifier = {
+									factor = 2
+									is_country_type = hfe_pirate
+								}
+								modifier = {
+									factor = 2
+									is_same_species = root
+								}
+								modifier = {
+									factor = 2
+									is_same_species = event_target:hfe_leaders_refuge
+								}
+								modifier = {
+									factor = 2
+									root = {
+										trust = {
+											who = prev
+											value >= 25
+										}
+									}
+								}
+								modifier = {
+									factor = 2
+									root = {
+										trust = {
+											who = prev
+											value >= 50
+										}
+									}
+								}
+								modifier = {
+									factor = 2
+									root = {
+										trust = {
+											who = prev
+											value >= 75
+										}
+									}
+								}
+								modifier = {
+									factor = 2
+									root = {
+										trust = {
+											who = prev
+											value >= 100
+										}
+									}
+								}
+							}
+							event_target:hfe_leaders_refuge = {
+								set_owner = prev
+								set_timed_leader_flag = {
+									flag = hfe_leaders_refuge
+									days = 1
+								}
+							}
+							change_variable = {
+								which = hfe_leaders_refuge
+								value = 1
+							}
+							set_timed_country_flag = {
+								flag = hfe_leaders.111
+								days = 1
+							}
+							if = {
+								limit = {
+									root = {
+										is_country_type = hfe_pirate
+									}
+								}
+								set_country_flag = hfe_leaders.111_from_pirate
+							}
+						}
+					}
+				}
+				#				# case CTD
+				#				# form pirate nation
+				#				10 = {
+				#					modifier = {
+				#				 		factor = 0
+				#				 		hfe_trigger_pirate_enabled = no
+				#				 	}
+				#				 	modifier = {
+				#				 		factor = 0
+				#				 		root = {
+				#				 			has_country_flag = hfe_pirate_spawned
+				#				 		}
+				#				 	}
+				#				 	modifier = {
+				#				 		factor = 0.5
+				#				 		root = {
+				#				 			is_pacifist = yes
+				#				 		}
+				#				 	}
+				#				 	modifier = {
+				#				 		factor = 2
+				#				 		root = {
+				#				 			is_militarist = yes
+				#				 		}
+				#				 	}
+				#				 	root = {
+				#				 		hfe_effect_pirate_init = yes
+				#				 	}
+				#				 	event_target:hfe_pirate_clan = {
+				#				 		set_graphical_culture = root
+				#				 		set_country_flag = hfe_leaders_refuge@root
+				#				 		assign_leader = prev
+				#				 		#set_name = "[root.species.GetName] Remnants"
+				#				 		hfe_effect_transfer_resources_from_root_to_this = yes
+				#				 	}
+				#				 }
+			}
+		}
+		every_country = {
+			country_event = {
+				id = hfe_leaders.111
+				days = 1
+			}
+		}
+	}
+}
+
+# refuge leaders notification
+country_event = {
+	id = hfe_leaders.111
+	title = hfe_leaders.111.name
+	desc = {
+		trigger = {
+			success_text = {
+				text = hfe_leaders.111.desc.0.0
+				check_variable = {
+					which = hfe_leaders_refuge
+					value = 1
+				}
+			}
+			success_text = {
+				text = hfe_leaders.111.desc.0.1
+				check_variable = {
+					which = hfe_leaders_refuge
+					value > 1
+				}
+			}
+			text = hfe_leaders.111.desc.1
+		}
+	}
+	picture = GFX_evt_galactic_senate
+	is_triggered_only = yes
+	trigger = {
+		is_ai = no
+		check_variable = {
+			which = hfe_leaders_refuge
+			value > 0
+		}
+	}
+	immediate = {
+		random_owned_leader = {
+			limit = {
+				has_leader_flag = hfe_leaders_refuge
+			}
+			save_event_target_as = hfe_leaders_refuge
+		}
+	}
+	option = {
+		name = hfe_leaders.111.1
+		exclusive_trigger = {
+			has_country_flag = hfe_leaders.111_from_pirate
+		}
+	}
+	option = {
+		name = hfe_leaders.111.0
+	}
+	after = {
+		hidden_effect = {
+			clear_variable = hfe_leaders_refuge
+			remove_country_flag = hfe_leaders.111_from_pirate
+		}
+	}
+}

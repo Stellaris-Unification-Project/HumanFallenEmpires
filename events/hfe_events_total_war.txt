@@ -1,0 +1,3092 @@
+# Total War and The War in Heavens by Human Fallen Empires
+namespace = hfe_total_war
+# star war events 0 - 50
+# invite subjects and set flags
+# on_war_beginning
+# A war is beginning, executed for every country in the war.
+# Root = Country
+# From = War
+country_event = {
+	id = hfe_total_war.0
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		from = {
+			using_war_goal = {
+				type = hfe_wg_total_war
+				owner = root
+			}
+		}
+	}
+	immediate = {
+		if = {
+			limit = {
+				is_war_leader = yes
+			}
+			if = {
+				limit = {
+					has_global_flag = hfe_general_logs
+				}
+				log = "hfe total war run core systen flags for [this.GetName]"
+			}
+			every_system_within_border = {
+				set_star_flag = hfe_total_war_core_system_of@root
+			}
+		}
+		if = {
+			limit = {
+				is_overlord = yes
+			}
+			if = {
+				limit = {
+					has_global_flag = hfe_general_logs
+				}
+				log = "hfe total war call subjects for [this.GetName]"
+			}
+			every_subject = {
+				join_war = root
+			}
+		}
+	}
+}
+
+# events during total war 50 - 100
+# fallen drain resources if losing war 50
+country_event = {
+	id = hfe_total_war.50
+	title = hfe_total_war.50.name
+	desc = hfe_total_war.50.desc
+	picture = GFX_evt_hfe_fallen_3
+	show_sound = event_alien_signal
+	is_triggered_only = yes
+	trigger = {
+		exists = overlord
+		not = {
+			has_modifier = hfe_fallen_resources_drain
+		}
+	}
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = hfe_general_logs
+			}
+			log = "hfe work event hfe_total_war.50 for [this.GetName] overlord: [overlord.GetName]"
+		}
+	}
+	option = {
+		name = hfe_total_war.50.0
+		add_modifier = {
+			modifier = hfe_fallen_resources_drain
+			years = 5
+		}
+		overlord = {
+			add_modifier = {
+				modifier = hfe_fallen_ship_build_buff
+				years = 5
+			}
+		}
+	}
+}
+
+# annex occupying systems planet 51
+# A planets controller becomes a country not the same as the owner.
+# Root = Planet
+# From = Planet Owner
+# FromFrom = Planet Controller (the one occupying)
+planet_event = {
+	id = hfe_total_war.51
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_war_in_heavens_custom_wg_system_shift_enabled = yes
+		exists = owner
+		exists = controller
+		exists = solar_system
+		nor = {
+			is_controlled_by = owner
+			solar_system = {
+				or = {
+					has_star_flag = hfe_total_war_core_system_of@owner
+					any_system_planet = {
+						# colonized planet
+						is_owned_by = prev.owner
+						is_controlled_by = prev.owner
+					}
+				}
+			}
+		}
+		# this is total war
+		owner = {
+			any_war = {
+				# any_war_participant = {
+				# 	is_country = root.owner
+				# 	is_war_leader = no
+				# }
+				any_war_participant = {
+					is_country = root.controller
+				}
+				# total war used
+				any_war_participant = {
+					prev = {
+						using_war_goal = {
+							type = hfe_wg_total_war
+							owner = prev
+						}
+					}
+					# or = {
+					# 	is_in_federation_with = root.controller
+					# 	is_country = root.controller
+					# 	any_subject = {
+					# 		is_country = root.controller
+					# 	}
+					# }
+				}
+			}
+		}
+	}
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = hfe_general_logs
+			}
+			log = "hfe total war change owner of planets and system [solar_system.GetName] old owner [owner.GetName] new owner [controller.GetName]"
+		}
+		solar_system = {
+			every_system_planet = {
+				limit = {
+					is_owned_by = root.owner
+				}
+				# conquer = controller
+				set_owner = controller
+			}
+		}
+		if = {
+			limit = {
+				exists = starbase
+			}
+			starbase = {
+				set_owner = root.controller
+			}
+		}
+	}
+}
+
+# annex occupying systems starbase 52
+# on_ship_disabled
+# This = Ship
+# From = Disabler Ship
+ship_event = {
+	id = hfe_total_war.52
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_war_in_heavens_custom_wg_system_shift_enabled = yes
+		exists = this
+		exists = owner
+		exists = from.owner
+		exists = fleet
+		exists = solar_system
+		is_ship_class = shipclass_starbase
+		solar_system = {
+			not = {
+				has_star_flag = hfe_total_war_core_system_of@owner
+				any_system_planet = {
+					# colonized planet
+					is_owned_by = prev.owner
+					is_controlled_by = prev.owner
+				}
+			}
+		}
+		# this is total war
+		owner = {
+			any_war = {
+				# any_war_participant = {
+				# 	is_country = root.solar_system.owner
+				# 	is_war_leader = no
+				# }
+				any_war_participant = {
+					is_country = from.owner
+				}
+				# war leader use wg
+				any_war_participant = {
+					prev = {
+						using_war_goal = {
+							type = hfe_wg_total_war
+							owner = prev
+						}
+					}
+					# or = {
+					# 	is_in_federation_with = root.from
+					# 	is_country = root.from
+					# 	any_subject = {
+					# 		is_country = root.from
+					# 	}
+					# }
+				}
+			}
+		}
+	}
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = hfe_general_logs
+			}
+			log = "hfe total war change owner of system [solar_system.GetName] old owner [owner.GetName] new owner [from.owner.GetName]"
+		}
+		fleet = {
+			set_owner = from.owner
+		}
+	}
+}
+
+# events after war end 100 - 150
+country_event = {
+	id = hfe_total_war.100
+	title = hfe_total_war.100.name
+	desc = hfe_total_war.100.desc.0
+	picture = GFX_evt_fallen_empire_awakes
+	show_sound = event_space_battle
+	is_triggered_only = yes
+	immediate = {
+		event_target:hfe_total_war_loser = {
+			every_subject = {
+				root = {
+					hfe_effect_this_make_overlord_of_prev = yes
+				}
+				join_war = root
+			}
+			every_federation_ally = {
+				leave_alliance = {
+					override_requirements = yes
+				}
+				root = {
+					hfe_effect_this_make_overlord_of_prev = yes
+				}
+				join_war = root
+			}
+		}
+		# clear flags
+		every_system = {
+			every_country = {
+				limit = {
+					is_at_war = no
+				}
+				prev = {
+					if = {
+						limit = {
+							has_star_flag = hfe_total_war_core_system_of@prev
+						}
+						remove_star_flag = hfe_total_war_core_system_of@prev
+					}
+				}
+			}
+		}
+	}
+	# make primitive
+	option = {
+		name = hfe_total_war.100.0
+		custom_tooltip = hfe_total_war.100.0.tooltip
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0.0001
+				is_materialist = no
+			}
+		}
+		if = {
+			limit = {
+				event_target:hfe_total_war_loser = {
+					hfe_trigger_is_fallen = yes
+				}
+			}
+			hfe_effect_egalitarian_attraction.3 = yes
+		}
+		else = {
+			hfe_effect_materialist_attraction.2 = yes
+		}
+		hidden_effect = {
+			event_target:hfe_total_war_loser = {
+				set_country_flag = silence_destroy_event
+				hfe_effect_pirate_flee_fleets = yes
+				hfe_effect_refuge_20 = yes
+				every_owned_planet = {
+					add_threat = {
+						who = root
+						amount = 1						# scales to pops
+					}
+					hfe_effect_primitive_make_primitive = yes
+				}
+			}
+			# inform
+			every_playable_country = {
+				country_event = {
+					id = hfe_total_war.150
+				}
+			}
+		}
+	}
+	# annex
+	option = {
+		name = hfe_total_war.100.1.0
+		custom_tooltip = hfe_total_war.100.1.0.tooltip
+		trigger = {
+			is_authoritarian = no
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0.0001
+				is_egalitarian = no
+				hfe_trigger_is_assimilator = no
+			}
+		}
+		if = {
+			limit = {
+				event_target:hfe_total_war_loser = {
+					hfe_trigger_is_fallen = yes
+				}
+			}
+			hfe_effect_egalitarian_attraction.2 = yes
+		}
+		else = {
+			hfe_effect_egalitarian_attraction.1 = yes
+		}
+		hidden_effect = {
+			event_target:hfe_total_war_loser = {
+				set_country_flag = silence_destroy_event
+				hfe_effect_pirate_flee_fleets = yes
+				hfe_effect_refuge_20 = yes
+				every_owned_starbase = {
+					set_owner = root
+				}
+				every_owned_planet = {
+					add_threat = {
+						who = root
+						amount = 1						# scales to pops
+					}
+					# conquer = root
+					set_owner = root
+				}
+			}
+			# inform
+			every_playable_country = {
+				country_event = {
+					id = hfe_total_war.151
+				}
+			}
+		}
+	}
+	# annex and enslave
+	option = {
+		name = hfe_total_war.100.1.1
+		custom_tooltip = hfe_total_war.100.1.1.tooltip
+		trigger = {
+			is_egalitarian = no
+			is_gestalt = no
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 100
+				has_country_flag = hfe_egypt
+			}
+			modifier = {
+				factor = 0.0001
+				hfe_trigger_is_authoritarian = no
+				not = {
+					has_country_flag = hfe_egypt
+				}
+			}
+		}
+		if = {
+			limit = {
+				event_target:hfe_total_war_loser = {
+					hfe_trigger_is_fallen = yes
+				}
+			}
+			hfe_effect_authoritarian_attraction.2 = yes
+		}
+		else = {
+			hfe_effect_authoritarian_attraction.1 = yes
+		}
+		hidden_effect = {
+			event_target:hfe_total_war_loser = {
+				set_country_flag = silence_destroy_event
+				hfe_effect_pirate_flee_fleets = yes
+				hfe_effect_refuge_20 = yes
+				every_owned_pop_species = {
+					limit = {
+						not = {
+							is_same_species = root
+						}
+						hfe_trigger_is_citizen = {
+							hfe_country = prev
+						}
+					}
+					set_species_flag = hfe_forever_slave@root
+					set_citizenship_type = {
+						country = root
+						type = citizenship_slavery
+						cooldown = no
+					}
+				}
+				every_owned_starbase = {
+					set_owner = root
+				}
+				every_owned_planet = {
+					add_threat = {
+						who = root
+						amount = 1						# scales to pops
+					}
+					# conquer = root
+					set_owner = root
+				}
+			}
+			# inform
+			every_playable_country = {
+				country_event = {
+					id = hfe_total_war.151
+				}
+			}
+		}
+	}
+	# make vassal
+	option = {
+		name = hfe_total_war.100.2
+		custom_tooltip = hfe_total_war.100.2.tooltip
+		trigger = {
+			is_country_type_with_subjects = yes
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0.0001
+				is_spiritualist = no
+				is_xenophile = no
+				not = {
+					is_country = event_target:hfe_coalition_leader
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:hfe_total_war_loser = {
+				set_country_flag = silence_destroy_event
+				hfe_effect_pirate_flee_fleets = yes
+				hfe_effect_refuge_20 = yes
+				hfe_effect_create_vassal = yes
+			}
+			# inform
+			every_playable_country = {
+				country_event = {
+					id = hfe_total_war.152
+				}
+			}
+		}
+	}
+	# kill them all
+	option = {
+		name = hfe_total_war.100.3
+		custom_tooltip = hfe_total_war.100.3.tooltip
+		trigger = {
+			allows_purge = yes
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0.0001
+				is_xenophobe = no
+				is_homicidal = no
+			}
+		}
+		if = {
+			limit = {
+				event_target:hfe_total_war_loser = {
+					hfe_trigger_is_fallen = yes
+				}
+			}
+			hfe_effect_xenophobe_attraction.3 = yes
+		}
+		else = {
+			hfe_effect_xenophobe_attraction.2 = yes
+		}
+		hidden_effect = {
+			event_target:hfe_total_war_loser = {
+				set_country_flag = silence_destroy_event
+				hfe_effect_pirate_flee_fleets = yes
+				hfe_effect_refuge_20 = yes
+				every_owned_planet = {
+					add_threat = {
+						who = root
+						amount = 3						# scales to pops
+					}
+					destroy_colony = yes
+				}
+			}
+			# inform
+			every_playable_country = {
+				country_event = {
+					id = hfe_total_war.153
+				}
+			}
+		}
+	}
+	# make infertile
+	option = {
+		name = hfe_total_war.100.4
+		custom_tooltip = hfe_total_war.100.4.tooltip
+		trigger = {
+			allows_purge = yes
+		}
+		ai_chance = {
+			factor = 1
+			modifier = {
+				factor = 0.0001
+				is_xenophile = no
+				is_materialist = no
+				is_pacifist = no
+			}
+		}
+		if = {
+			limit = {
+				event_target:hfe_total_war_loser = {
+					hfe_trigger_is_fallen = yes
+				}
+			}
+			hfe_effect_pacifist_attraction.3 = yes
+			hfe_effect_xenophobe_attraction.1 = yes
+		}
+		else = {
+			hfe_effect_pacifist_attraction.2 = yes
+			hfe_effect_xenophobe_attraction.0 = yes
+		}
+		hidden_effect = {
+			event_target:hfe_total_war_loser = {
+				every_owned_pop_species = {
+					limit = {
+						hfe_trigger_is_robot = no
+						not = {
+							has_trait = hfe_species_trait_infertile
+						}
+					}
+					prev = {
+						modify_species = {
+							species = prev
+							add_trait = hfe_species_trait_infertile
+						}
+					}
+				}
+				hfe_effect_refuge_20 = yes
+				every_owned_planet = {
+					add_threat = {
+						who = root
+						amount = 1						# scales to pops
+					}
+					every_owned_pop = {
+						random_list = {
+							50 = {
+							}
+							50 = {
+								kill_pop = yes
+							}
+						}
+					}
+				}
+			}
+			# inform
+			every_playable_country = {
+				country_event = {
+					id = hfe_total_war.154
+				}
+			}
+		}
+	}
+}
+
+# inform after total war 150 - 200
+country_event = {
+	id = hfe_total_war.150
+	title = hfe_total_war.150.name
+	desc = {
+		trigger = {
+			success_text = {
+				text = hfe_total_war.150.desc.0
+				is_country = from
+			}
+			fail_text = {
+				text = hfe_total_war.150.desc.1
+				is_country = from
+			}
+		}
+	}
+	picture = GFX_evt_hfe_tech_fail
+	show_sound = event_space_battle
+	is_triggered_only = yes
+	option = {
+		name = hfe_total_war.150.0
+		trigger = {
+			is_country = from
+		}
+	}
+	option = {
+		name = hfe_total_war.150.1
+		trigger = {
+			not = {
+				is_country = from
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_total_war.151
+	title = hfe_total_war.151.name
+	desc = {
+		trigger = {
+			success_text = {
+				text = hfe_total_war.151.desc.0
+				is_country = from
+			}
+			fail_text = {
+				text = hfe_total_war.151.desc.1
+				is_country = from
+			}
+		}
+	}
+	picture = GFX_evt_hfe_ships_on_orbit
+	show_sound = event_space_battle
+	is_triggered_only = yes
+	trigger = {
+		is_ai = no
+	}
+	option = {
+		name = hfe_total_war.151.0
+		trigger = {
+			is_country = from
+		}
+	}
+	option = {
+		name = hfe_total_war.151.1
+		trigger = {
+			not = {
+				is_country = from
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_total_war.152
+	title = hfe_total_war.152.name
+	desc = {
+		trigger = {
+			success_text = {
+				text = hfe_total_war.152.desc.0
+				is_country = from
+			}
+			fail_text = {
+				text = hfe_total_war.152.desc.1
+				is_country = from
+			}
+		}
+	}
+	picture = GFX_evt_hfe_city_center
+	show_sound = event_space_battle
+	is_triggered_only = yes
+	trigger = {
+		is_ai = no
+	}
+	option = {
+		name = hfe_total_war.152.0
+		trigger = {
+			is_country = from
+		}
+	}
+	option = {
+		name = hfe_total_war.152.1
+		trigger = {
+			not = {
+				is_country = from
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_total_war.153
+	title = hfe_total_war.153.name
+	desc = {
+		trigger = {
+			success_text = {
+				text = hfe_total_war.153.desc.0
+				is_country = from
+			}
+			fail_text = {
+				text = hfe_total_war.153.desc.1
+				is_country = from
+			}
+		}
+	}
+	picture = {
+		trigger = {
+			has_country_flag = hfe_random_0
+		}
+		picture = GFX_evt_hfe_ruins
+	}
+	picture = {
+		trigger = {
+			has_country_flag = hfe_random_1
+		}
+		picture = GFX_evt_city_ruins
+	}
+	show_sound = event_space_battle
+	is_triggered_only = yes
+	trigger = {
+		is_ai = no
+	}
+	immediate = {
+		hfe_effect_random_roll_flags_2_country = yes
+	}
+	option = {
+		name = hfe_total_war.153.0
+		trigger = {
+			is_country = from
+		}
+	}
+	option = {
+		name = hfe_total_war.153.1
+		trigger = {
+			not = {
+				is_country = from
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_total_war.154
+	title = hfe_total_war.154.name
+	desc = {
+		trigger = {
+			success_text = {
+				text = hfe_total_war.154.desc.0
+				is_country = from
+			}
+			fail_text = {
+				text = hfe_total_war.154.desc.1
+				is_country = from
+			}
+		}
+	}
+	picture = {
+		trigger = {
+			has_country_flag = hfe_random_0
+		}
+		picture = GFX_evt_hfe_ruins
+	}
+	picture = {
+		trigger = {
+			has_country_flag = hfe_random_1
+		}
+		picture = GFX_evt_city_ruins
+	}
+	show_sound = event_space_battle
+	is_triggered_only = yes
+	trigger = {
+		is_ai = no
+	}
+	immediate = {
+		hfe_effect_random_roll_flags_2_country = yes
+	}
+	option = {
+		name = hfe_total_war.154.0
+		trigger = {
+			is_country = from
+		}
+	}
+	option = {
+		name = hfe_total_war.154.1
+		trigger = {
+			not = {
+				is_country = from
+			}
+		}
+	}
+}
+
+# war in heaven 1000+
+# awake fallen event
+country_event = {
+	id = hfe_total_war.1000
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_war_in_heavens_enabled = yes
+		is_country_type = fallen_empire
+		end_game_years_passed >= 0
+		NOT = {
+			has_ethic = ethic_gestalt_consciousness
+		}
+		is_at_war = no
+		hfe_trigger_fallen_awake_playable_country_power = yes
+	}
+	immediate = {
+		random_list = {
+			200 = {
+			}
+			10 = {
+				modifier = {
+					factor = 2
+					is_difficulty > 0
+				}
+				modifier = {
+					factor = 2
+					is_difficulty > 1
+				}
+				modifier = {
+					factor = 2
+					is_difficulty > 2
+				}
+				modifier = {
+					factor = 2
+					is_difficulty > 3
+				}
+				modifier = {
+					factor = 2
+					is_difficulty > 4
+				}
+				modifier = {
+					factor = 0.5
+					num_fallen_empires > 2
+				}
+				modifier = {
+					factor = 0.5
+					num_fallen_empires > 3
+				}
+				modifier = {
+					factor = 0.5
+					num_fallen_empires > 4
+				}
+				modifier = {
+					factor = 4
+					has_global_flag = galactic_crisis_happened
+				}
+				# power modifier
+				modifier = {
+					factor = 4
+					any_country = {
+						is_country_type = default
+						any_owned_planet = {
+							has_planet_flag = fallen_empire_world
+						}
+					}
+				}
+				modifier = {
+					factor = 2
+					any_country = {
+						is_country_type = default
+						or = {
+							relative_power = {
+								who = prev
+								value >= superior
+							}
+							# and = {
+							# 	exists = federation
+							# 	federation = {
+							# 		relative_power = {
+							# 			who = prevprev
+							# 			value >= superior
+							# 		}
+							# 	}
+							# }
+						}
+					}
+				}
+				modifier = {
+					factor = 2
+					any_country = {
+						is_country_type = default
+						or = {
+							relative_power = {
+								who = prev
+								value = overwhelming
+							}
+							# and = {
+							# 	exists = federation
+							# 	federation = {
+							# 		relative_power = {
+							# 			who = prevprev
+							# 			value = overwhelming
+							# 		}
+							# 	}
+							# }
+						}
+					}
+				}
+				# awake
+				# fleets
+				country_event = {
+					id = fallen_empires_awakening.3
+				}
+				# Notify players
+				every_country = {
+					limit = {
+						is_ai = no
+					}
+					establish_communications_no_message = prev
+					country_event = {
+						id = fallen_empires_awakening.2
+					}
+				}
+				observer_event = {
+					id = observer.73
+				}
+				# should not go to war on its own
+				if = {
+					limit = {
+						has_global_flag = hfe_war_in_heaven_started
+					}
+					set_timed_country_flag = {
+						flag = ai_no_wars
+						days = 3650
+					}
+				}
+				# join war in heavens
+				country_event = {
+					id = hfe_total_war.1001
+					days = 360
+					random = 100
+				}
+			}
+		}
+	}
+}
+
+# join war in heavens if its ongoing
+country_event = {
+	id = hfe_total_war.1001
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		has_global_flag = hfe_war_in_heaven_started
+		any_relation = {
+			has_country_flag = hfe_war_in_heaven_fallen
+		}
+	}
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = hfe_general_logs
+			}
+			log = "hfe [this.GetName] awakening fallen joining fun"
+		}
+		remove_country_flag = ai_no_wars
+		set_country_flag = hfe_war_in_heaven_fallen
+		save_event_target_as = hfe_total_war_attaker
+		every_country = {
+			limit = {
+				or = {
+					has_country_flag = hfe_war_in_heaven_fallen
+					and = {
+						exists = federation
+						federation = {
+							has_federation_flag = non_aligned_league
+						}
+						is_federation_leader = yes
+					}
+				}
+			}
+			save_event_target_as = hfe_total_war_defender
+			hfe_effect_total_war_declare = yes
+		}
+	}
+}
+
+# start war 1010
+country_event = {
+	id = hfe_total_war.1010
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_war_in_heavens_enabled = yes
+		host_has_dlc = "Leviathans Story Pack"
+		not = {
+			has_global_flag = hfe_war_in_heaven_started
+		}
+		count_country = {
+			count >= 2
+			limit = {
+				is_country_type = awakened_fallen_empire
+				fleet_power > 40000
+			}
+		}
+	}
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = hfe_general_logs
+			}
+			log = "hfe war in heavens started"
+		}
+		observer_event = {
+			id = observer.76
+		}
+		random_list = {
+			3 = {
+				modifier = {
+					factor = 0
+					has_global_flag = hfe_war_in_heaven_started_by_ai
+				}
+			}
+			1 = {
+				set_global_flag = war_in_heaven_ongoing
+				set_global_flag = hfe_war_in_heaven_started
+				every_country = {
+					limit = {
+						is_country_type = awakened_fallen_empire
+						fleet_power > 40000
+					}
+					# remove_country_flag = ai_no_wars
+					set_country_flag = hfe_war_in_heaven_fallen
+					add_awakened_fallen_empire_resources = yes
+					# copied from vanilla, seems to be a lot idk
+					add_awakened_fallen_empire_fleet = yes
+					hfe_effect_save_event_target = yes
+				}
+				# can be up to 6 targets from 0 to 5 index
+				if = {
+					limit = {
+						exists = event_target:hfe_event_target_5
+					}
+					# 5 vs all other
+					# 5 vs 4
+					event_target:hfe_event_target_5 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_4 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 5 vs 3
+					event_target:hfe_event_target_5 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_3 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 5 vs 2
+					event_target:hfe_event_target_5 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_2 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 5 vs 1
+					event_target:hfe_event_target_5 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_1 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 5 vs 0
+					event_target:hfe_event_target_5 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_0 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+				}
+				if = {
+					limit = {
+						exists = event_target:hfe_event_target_4
+					}
+					# 4 vs all other
+					# 4 vs 3
+					event_target:hfe_event_target_4 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_3 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 4 vs 2
+					event_target:hfe_event_target_4 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_2 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 4 vs 1
+					event_target:hfe_event_target_4 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_1 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 4 vs 0
+					event_target:hfe_event_target_4 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_0 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+				}
+				if = {
+					limit = {
+						exists = event_target:hfe_event_target_3
+					}
+					# 3 vs all other
+					# 3 vs 2
+					event_target:hfe_event_target_3 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_2 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 3 vs 1
+					event_target:hfe_event_target_3 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_1 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 3 vs 0
+					event_target:hfe_event_target_3 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_0 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+				}
+				if = {
+					limit = {
+						exists = event_target:hfe_event_target_2
+					}
+					# 2 vs all other
+					# 2 vs 1
+					event_target:hfe_event_target_2 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_1 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+					# 2 vs 0
+					event_target:hfe_event_target_2 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_0 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+				}
+				if = {
+					limit = {
+						exists = event_target:hfe_event_target_1
+					}
+					# 1 vs all other
+					# 1 vs 0
+					event_target:hfe_event_target_1 = {
+						save_event_target_as = hfe_total_war_attaker
+					}
+					event_target:hfe_event_target_0 = {
+						save_event_target_as = hfe_total_war_defender
+					}
+					hfe_effect_total_war_declare = yes
+				}
+				every_country = {
+					country_event = {
+						id = hfe_total_war.1050
+					}
+				}
+				# non-aligned league
+				event_target:global_event_country = {
+					country_event = {
+						id = hfe_total_war.1100
+						days = 30
+						random = 30
+					}
+				}
+			}
+		}
+	}
+}
+
+# fire event by on_war_beginning
+country_event = {
+	id = hfe_total_war.1011
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		hfe_trigger_war_in_heavens_enabled = yes
+		host_has_dlc = "Leviathans Story Pack"
+		not = {
+			has_global_flag = hfe_war_in_heaven_started_by_ai
+		}
+		is_country_type = awakened_fallen_empire
+		any_relation = {
+			is_country_type = awakened_fallen_empire
+			is_at_war_with = root
+		}
+	}
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = hfe_general_logs
+			}
+			log = "hfe war in heavens start by ai"
+		}
+		set_global_flag = hfe_war_in_heaven_started_by_ai
+		country_event = {
+			id = hfe_total_war.1010
+		}
+	}
+}
+
+# inform events 10050
+country_event = {
+	id = hfe_total_war.1050
+	title = hfe_total_war.1050.name
+	desc = {
+		trigger = {
+			fail_text = {
+				text = hfe_total_war.1050.desc.0.0
+				exists = event_target:hfe_event_target_2
+			}
+			success_text = {
+				text = hfe_total_war.1050.desc.0.1
+				exists = event_target:hfe_event_target_2
+				not = {
+					exists = event_target:hfe_event_target_3
+				}
+			}
+			success_text = {
+				text = hfe_total_war.1050.desc.0.2
+				exists = event_target:hfe_event_target_3
+			}
+			success_text = {
+				text = hfe_total_war.1050.desc.1.0
+				exists = event_target:hfe_coalition_leader
+			}
+			success_text = {
+				text = hfe_total_war.1050.desc.1.1
+				exists = event_target:hfe_egypt_country
+				event_target:hfe_egypt_country = {
+					not = {
+						is_country = event_target:hfe_coalition_leader
+					}
+				}
+			}
+			text = hfe_total_war.1050.desc.2.0
+		}
+	}
+	picture = GFX_evt_fallen_empire_awakes
+	show_sound = event_alien_signal
+	is_triggered_only = yes
+	trigger = {
+		is_country_type = default
+	}
+	# step 0 for vanilla fallen empires
+	option = {
+		name = hfe_total_war.1050.0.0
+		trigger = {
+			is_subject = no
+			is_country_type = default
+			exists = event_target:hfe_event_target_0
+		}
+		ai_chance = {
+			factor = 100
+			# special
+			modifier = {
+				factor = 0
+				or = {
+					is_homicidal = yes
+					hfe_trigger_is_human_fallen = yes
+				}
+			}
+			# neighborship
+			modifier = {
+				factor = 4
+				is_neighbor_of = event_target:hfe_event_target_0
+			}
+			# ethics
+			modifier = {
+				factor = 0.25
+				or = {
+					and = {
+						event_target:hfe_event_target_0 = {
+							is_militarist = no
+						}
+						is_militarist = no
+					}
+					and = {
+						event_target:hfe_event_target_0 = {
+							is_xenophile = no
+						}
+						is_xenophile = no
+					}
+					and = {
+						event_target:hfe_event_target_0 = {
+							is_spiritualist = no
+						}
+						is_spiritualist = no
+					}
+					and = {
+						event_target:hfe_event_target_0 = {
+							is_materialist = no
+						}
+						is_materialist = no
+					}
+					is_xenophobe = yes
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					and = {
+						event_target:hfe_event_target_0 = {
+							is_xenophile = yes
+						}
+						is_xenophile = yes
+					}
+					and = {
+						event_target:hfe_event_target_0 = {
+							is_militarist = yes
+						}
+						is_militarist = yes
+					}
+					and = {
+						event_target:hfe_event_target_0 = {
+							is_spiritualist = yes
+						}
+						is_spiritualist = yes
+					}
+					and = {
+						event_target:hfe_event_target_0 = {
+							is_materialist = yes
+						}
+						is_materialist = yes
+					}
+				}
+			}
+			# fleet power
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_0
+						value >= overwhelming
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_0
+								value = overwhelming
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_0
+						value >= superior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_0
+								value >= superior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_0
+						value >= equivalent
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_0
+								value >= equivalent
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_0
+						value >= inferior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_0
+								value >= inferior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_0
+						value = pathetic
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_0
+								value = pathetic
+							}
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:hfe_event_target_0 = {
+				hfe_effect_this_make_overlord_of_prev = yes
+			}
+			add_opinion_modifier = {
+				who = event_target:hfe_event_target_0
+				modifier = opinion_war_in_heaven_ally
+			}
+			event_target:hfe_event_target_0 = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_war_in_heaven_ally
+				}
+			}
+		}
+	}
+	option = {
+		name = hfe_total_war.1050.0.1
+		trigger = {
+			is_subject = no
+			is_country_type = default
+			exists = event_target:hfe_event_target_1
+		}
+		ai_chance = {
+			factor = 100
+			# special
+			modifier = {
+				factor = 0
+				or = {
+					is_homicidal = yes
+					hfe_trigger_is_human_fallen = yes
+				}
+			}
+			# neighborship
+			modifier = {
+				factor = 4
+				is_neighbor_of = event_target:hfe_event_target_1
+			}
+			# ethics
+			modifier = {
+				factor = 0.25
+				or = {
+					and = {
+						event_target:hfe_event_target_1 = {
+							is_militarist = no
+						}
+						is_militarist = no
+					}
+					and = {
+						event_target:hfe_event_target_1 = {
+							is_xenophile = no
+						}
+						is_xenophile = no
+					}
+					and = {
+						event_target:hfe_event_target_1 = {
+							is_spiritualist = no
+						}
+						is_spiritualist = no
+					}
+					and = {
+						event_target:hfe_event_target_1 = {
+							is_materialist = no
+						}
+						is_materialist = no
+					}
+					is_xenophobe = yes
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					and = {
+						event_target:hfe_event_target_1 = {
+							is_xenophile = yes
+						}
+						is_xenophile = yes
+					}
+					and = {
+						event_target:hfe_event_target_1 = {
+							is_militarist = yes
+						}
+						is_militarist = yes
+					}
+					and = {
+						event_target:hfe_event_target_1 = {
+							is_spiritualist = yes
+						}
+						is_spiritualist = yes
+					}
+					and = {
+						event_target:hfe_event_target_1 = {
+							is_materialist = yes
+						}
+						is_materialist = yes
+					}
+				}
+			}
+			# fleet power
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_1
+						value >= overwhelming
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_1
+								value = overwhelming
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_1
+						value >= superior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_1
+								value >= superior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_1
+						value >= equivalent
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_1
+								value >= equivalent
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_1
+						value >= inferior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_1
+								value >= inferior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_1
+						value = pathetic
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_1
+								value = pathetic
+							}
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:hfe_event_target_1 = {
+				hfe_effect_this_make_overlord_of_prev = yes
+			}
+			add_opinion_modifier = {
+				who = event_target:hfe_event_target_1
+				modifier = opinion_war_in_heaven_ally
+			}
+			event_target:hfe_event_target_1 = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_war_in_heaven_ally
+				}
+			}
+		}
+	}
+	option = {
+		name = hfe_total_war.1050.0.2
+		trigger = {
+			is_subject = no
+			is_country_type = default
+			exists = event_target:hfe_event_target_2
+		}
+		ai_chance = {
+			factor = 100
+			modifier = {
+				factor = 0
+				or = {
+					is_homicidal = yes
+					hfe_trigger_is_human_fallen = yes
+				}
+			}
+			# special
+			modifier = {
+				factor = 0
+				or = {
+					is_homicidal = yes
+					hfe_trigger_is_human_fallen = yes
+				}
+			}
+			# neighborship
+			modifier = {
+				factor = 4
+				is_neighbor_of = event_target:hfe_event_target_2
+			}
+			# ethics
+			modifier = {
+				factor = 0.25
+				or = {
+					and = {
+						event_target:hfe_event_target_2 = {
+							is_militarist = no
+						}
+						is_militarist = no
+					}
+					and = {
+						event_target:hfe_event_target_2 = {
+							is_xenophile = no
+						}
+						is_xenophile = no
+					}
+					and = {
+						event_target:hfe_event_target_2 = {
+							is_spiritualist = no
+						}
+						is_spiritualist = no
+					}
+					and = {
+						event_target:hfe_event_target_2 = {
+							is_materialist = no
+						}
+						is_materialist = no
+					}
+					is_xenophobe = yes
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					and = {
+						event_target:hfe_event_target_2 = {
+							is_xenophile = yes
+						}
+						is_xenophile = yes
+					}
+					and = {
+						event_target:hfe_event_target_2 = {
+							is_militarist = yes
+						}
+						is_militarist = yes
+					}
+					and = {
+						event_target:hfe_event_target_2 = {
+							is_spiritualist = yes
+						}
+						is_spiritualist = yes
+					}
+					and = {
+						event_target:hfe_event_target_2 = {
+							is_materialist = yes
+						}
+						is_materialist = yes
+					}
+				}
+			}
+			# fleet power
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_2
+						value >= overwhelming
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_2
+								value = overwhelming
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_2
+						value >= superior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_2
+								value >= superior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_2
+						value >= equivalent
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_2
+								value >= equivalent
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_2
+						value >= inferior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_2
+								value >= inferior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_2
+						value = pathetic
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_2
+								value = pathetic
+							}
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:hfe_event_target_2 = {
+				hfe_effect_this_make_overlord_of_prev = yes
+			}
+			add_opinion_modifier = {
+				who = event_target:hfe_event_target_2
+				modifier = opinion_war_in_heaven_ally
+			}
+			event_target:hfe_event_target_2 = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_war_in_heaven_ally
+				}
+			}
+		}
+	}
+	option = {
+		name = hfe_total_war.1050.0.3
+		trigger = {
+			is_subject = no
+			is_country_type = default
+			exists = event_target:hfe_event_target_3
+		}
+		ai_chance = {
+			factor = 100
+			# special
+			modifier = {
+				factor = 0
+				or = {
+					is_homicidal = yes
+					hfe_trigger_is_human_fallen = yes
+				}
+			}
+			# neighborship
+			modifier = {
+				factor = 4
+				is_neighbor_of = event_target:hfe_event_target_3
+			}
+			# ethics
+			modifier = {
+				factor = 0.25
+				or = {
+					and = {
+						event_target:hfe_event_target_3 = {
+							is_militarist = no
+						}
+						is_militarist = no
+					}
+					and = {
+						event_target:hfe_event_target_3 = {
+							is_xenophile = no
+						}
+						is_xenophile = no
+					}
+					and = {
+						event_target:hfe_event_target_3 = {
+							is_spiritualist = no
+						}
+						is_spiritualist = no
+					}
+					and = {
+						event_target:hfe_event_target_3 = {
+							is_materialist = no
+						}
+						is_materialist = no
+					}
+					is_xenophobe = yes
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					and = {
+						event_target:hfe_event_target_3 = {
+							is_xenophile = yes
+						}
+						is_xenophile = yes
+					}
+					and = {
+						event_target:hfe_event_target_3 = {
+							is_militarist = yes
+						}
+						is_militarist = yes
+					}
+					and = {
+						event_target:hfe_event_target_3 = {
+							is_spiritualist = yes
+						}
+						is_spiritualist = yes
+					}
+					and = {
+						event_target:hfe_event_target_3 = {
+							is_materialist = yes
+						}
+						is_materialist = yes
+					}
+				}
+			}
+			# fleet power
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_3
+						value >= overwhelming
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_3
+								value = overwhelming
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_3
+						value >= superior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_3
+								value >= superior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_3
+						value >= equivalent
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_3
+								value >= equivalent
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_3
+						value >= inferior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_3
+								value >= inferior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_3
+						value = pathetic
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_3
+								value = pathetic
+							}
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:hfe_event_target_3 = {
+				hfe_effect_this_make_overlord_of_prev = yes
+			}
+			add_opinion_modifier = {
+				who = event_target:hfe_event_target_3
+				modifier = opinion_war_in_heaven_ally
+			}
+			event_target:hfe_event_target_3 = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_war_in_heaven_ally
+				}
+			}
+		}
+	}
+	option = {
+		name = hfe_total_war.1050.0.4
+		trigger = {
+			is_subject = no
+			is_country_type = default
+			exists = event_target:hfe_event_target_4
+		}
+		ai_chance = {
+			factor = 100
+			# special
+			modifier = {
+				factor = 0
+				or = {
+					is_homicidal = yes
+					hfe_trigger_is_human_fallen = yes
+				}
+			}
+			# neighborship
+			modifier = {
+				factor = 4
+				is_neighbor_of = event_target:hfe_event_target_4
+			}
+			# ethics
+			modifier = {
+				factor = 0.25
+				or = {
+					and = {
+						event_target:hfe_event_target_4 = {
+							is_militarist = no
+						}
+						is_militarist = no
+					}
+					and = {
+						event_target:hfe_event_target_4 = {
+							is_xenophile = no
+						}
+						is_xenophile = no
+					}
+					and = {
+						event_target:hfe_event_target_4 = {
+							is_spiritualist = no
+						}
+						is_spiritualist = no
+					}
+					and = {
+						event_target:hfe_event_target_4 = {
+							is_materialist = no
+						}
+						is_materialist = no
+					}
+					is_xenophobe = yes
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					and = {
+						event_target:hfe_event_target_4 = {
+							is_xenophile = yes
+						}
+						is_xenophile = yes
+					}
+					and = {
+						event_target:hfe_event_target_4 = {
+							is_militarist = yes
+						}
+						is_militarist = yes
+					}
+					and = {
+						event_target:hfe_event_target_4 = {
+							is_spiritualist = yes
+						}
+						is_spiritualist = yes
+					}
+					and = {
+						event_target:hfe_event_target_4 = {
+							is_materialist = yes
+						}
+						is_materialist = yes
+					}
+				}
+			}
+			# fleet power
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_4
+						value >= overwhelming
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_4
+								value = overwhelming
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_4
+						value >= superior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_4
+								value >= superior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_4
+						value >= equivalent
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_4
+								value >= equivalent
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_4
+						value >= inferior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_4
+								value >= inferior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_4
+						value = pathetic
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_4
+								value = pathetic
+							}
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:hfe_event_target_4 = {
+				hfe_effect_this_make_overlord_of_prev = yes
+			}
+			add_opinion_modifier = {
+				who = event_target:hfe_event_target_4
+				modifier = opinion_war_in_heaven_ally
+			}
+			event_target:hfe_event_target_4 = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_war_in_heaven_ally
+				}
+			}
+		}
+	}
+	option = {
+		name = hfe_total_war.1050.0.5
+		trigger = {
+			is_subject = no
+			is_country_type = default
+			exists = event_target:hfe_event_target_5
+		}
+		ai_chance = {
+			factor = 100
+			# special
+			modifier = {
+				factor = 0
+				or = {
+					is_homicidal = yes
+					hfe_trigger_is_human_fallen = yes
+				}
+			}
+			# neighborship
+			modifier = {
+				factor = 4
+				is_neighbor_of = event_target:hfe_event_target_5
+			}
+			# ethics
+			modifier = {
+				factor = 0.25
+				or = {
+					and = {
+						event_target:hfe_event_target_5 = {
+							is_militarist = no
+						}
+						is_militarist = no
+					}
+					and = {
+						event_target:hfe_event_target_5 = {
+							is_xenophile = no
+						}
+						is_xenophile = no
+					}
+					and = {
+						event_target:hfe_event_target_5 = {
+							is_spiritualist = no
+						}
+						is_spiritualist = no
+					}
+					and = {
+						event_target:hfe_event_target_5 = {
+							is_materialist = no
+						}
+						is_materialist = no
+					}
+					is_xenophobe = yes
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					and = {
+						event_target:hfe_event_target_5 = {
+							is_xenophile = yes
+						}
+						is_xenophile = yes
+					}
+					and = {
+						event_target:hfe_event_target_5 = {
+							is_militarist = yes
+						}
+						is_militarist = yes
+					}
+					and = {
+						event_target:hfe_event_target_5 = {
+							is_spiritualist = yes
+						}
+						is_spiritualist = yes
+					}
+					and = {
+						event_target:hfe_event_target_5 = {
+							is_materialist = yes
+						}
+						is_materialist = yes
+					}
+				}
+			}
+			# fleet power
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_5
+						value >= overwhelming
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_5
+								value = overwhelming
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_5
+						value >= superior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_5
+								value >= superior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_5
+						value >= equivalent
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_5
+								value >= equivalent
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_5
+						value >= inferior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_5
+								value >= inferior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					relative_power = {
+						who = event_target:hfe_event_target_5
+						value = pathetic
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_event_target_5
+								value = pathetic
+							}
+						}
+					}
+				}
+			}
+		}
+		hidden_effect = {
+			event_target:hfe_event_target_5 = {
+				hfe_effect_this_make_overlord_of_prev = yes
+			}
+			add_opinion_modifier = {
+				who = event_target:hfe_event_target_5
+				modifier = opinion_war_in_heaven_ally
+			}
+			event_target:hfe_event_target_5 = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_war_in_heaven_ally
+				}
+			}
+		}
+	}
+	# step 1 for human fallen empires
+	option = {
+		name = hfe_total_war.1050.1.0
+		trigger = {
+			is_subject = no
+			is_country_type = default
+			exists = event_target:hfe_coalition_leader
+		}
+		ai_chance = {
+			# 30 because kad have more ethics and do not participate in war
+			factor = 30
+			# special
+			modifier = {
+				factor = 0
+				or = {
+					is_homicidal = yes
+					hfe_trigger_is_human_fallen = yes
+				}
+			}
+			# neighborship
+			modifier = {
+				factor = 4
+				is_neighbor_of = event_target:hfe_coalition_leader
+			}
+			# ethics
+			modifier = {
+				factor = 0.25
+				or = {
+					and = {
+						event_target:hfe_coalition_leader = {
+							is_militarist = no
+						}
+						is_militarist = no
+					}
+					and = {
+						event_target:hfe_coalition_leader = {
+							is_xenophile = no
+						}
+						is_xenophile = no
+					}
+					and = {
+						event_target:hfe_coalition_leader = {
+							is_spiritualist = no
+						}
+						is_spiritualist = no
+					}
+					and = {
+						event_target:hfe_coalition_leader = {
+							is_materialist = no
+						}
+						is_materialist = no
+					}
+					is_xenophobe = yes
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					and = {
+						event_target:hfe_coalition_leader = {
+							is_xenophile = yes
+						}
+						is_xenophile = yes
+					}
+					and = {
+						event_target:hfe_coalition_leader = {
+							is_militarist = yes
+						}
+						is_militarist = yes
+					}
+					and = {
+						event_target:hfe_coalition_leader = {
+							is_spiritualist = yes
+						}
+						is_spiritualist = yes
+					}
+					and = {
+						event_target:hfe_coalition_leader = {
+							is_materialist = yes
+						}
+						is_materialist = yes
+					}
+				}
+			}
+			# fleet power
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_coalition_leader
+						value >= overwhelming
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_coalition_leader
+								value = overwhelming
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_coalition_leader
+						value >= superior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_coalition_leader
+								value >= superior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_coalition_leader
+						value >= equivalent
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_coalition_leader
+								value >= equivalent
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 0.5
+				or = {
+					relative_power = {
+						who = event_target:hfe_coalition_leader
+						value >= inferior
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_coalition_leader
+								value >= inferior
+							}
+						}
+					}
+				}
+			}
+			modifier = {
+				factor = 4
+				or = {
+					relative_power = {
+						who = event_target:hfe_coalition_leader
+						value = pathetic
+					}
+					and = {
+						exists = federation
+						federation = {
+							relative_power = {
+								who = event_target:hfe_coalition_leader
+								value = pathetic
+							}
+						}
+					}
+				}
+			}
+		}
+		hfe_effect_advisor_future_on = yes
+		hidden_effect = {
+			event_target:hfe_coalition_leader = {
+				guarantee_country = {
+					target = root
+				}
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_war_in_heaven_ally
+				}
+				hfe_effect_this_make_overlord_of_prev = yes
+			}
+			add_opinion_modifier = {
+				who = event_target:hfe_future_country
+				modifier = opinion_war_in_heaven_ally
+			}
+			# ????? ?? ???????? ??????????? ?????? from = { add_opinion_modifier = { who = root modifier = opinion_war_in_heaven_enemy } }
+		}
+	}
+	# step 2 for other options
+	option = {
+		name = hfe_total_war.1050.2.0
+		trigger = {
+			is_subject = no
+		}
+		ai_chance = {
+			factor = 100
+			modifier = {
+				factor = 4
+				exists = federation
+				federation = {
+					any_member = {
+						is_ai = no
+					}
+				}
+			}
+		}
+	}
+	option = {
+		name = hfe_total_war.1050.2.1
+		trigger = {
+			is_subject = yes
+		}
+	}
+	after = {
+		if = {
+			limit = {
+				exists = overlord
+				overlord = {
+					is_at_war = yes
+				}
+			}
+			join_war = overlord
+		}
+	}
+}
+
+# non-aligned league 1100 - 1150
+# find leader for non-aligned league 1100
+country_event = {
+	id = hfe_total_war.1100
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		has_galactic_emperor = no
+		count_country = {
+			limit = {
+				is_country_type = default
+				is_at_war = no
+				is_subject = no
+				is_homicidal = no
+				not = {
+					has_country_flag = war_in_heaven_league_leader_declined
+				}
+			}
+			count > 1
+		}
+	}
+	immediate = {
+		random_country = {
+			limit = {
+				is_country_type = default
+				is_at_war = no
+				is_subject = no
+				is_homicidal = no
+				not = {
+					has_country_flag = war_in_heaven_league_leader_declined
+				}
+			}
+			weights = {
+				base = 1
+				modifier = {
+					factor = 100
+					is_federation_leader = yes
+				}
+				modifier = {
+					factor = 10
+					is_ai = no
+				}
+				modifier = {
+					factor = 10
+					any_relation = {
+						is_country_type = awakened_fallen_empire
+						relative_power = {
+							who = prev
+							value <= equivalent
+						}
+					}
+				}
+			}
+			country_event = {
+				id = hfe_total_war.1101
+			}
+		}
+	}
+}
+
+# offer non-aligned league leadership 1101
+country_event = {
+	id = hfe_total_war.1101
+	title = war_in_heaven.13.name
+	desc = {
+		text = war_in_heaven.13.desc
+		trigger = {
+			is_federation_leader = no
+		}
+	}
+	desc = {
+		text = war_in_heaven.13.desc2
+		trigger = {
+			is_federation_leader = yes
+		}
+	}
+	picture = GFX_evt_fallen_empire_awakes
+	show_sound = event_alien_signal
+	is_triggered_only = yes
+	option = {
+		name = war_in_heaven.13.a
+		ai_chance = {
+			factor = 100
+		}
+		# if leader of federation
+		if = {
+			limit = {
+				#existing federation will become the Non-Aligned League
+				has_federation = yes
+				is_federation_leader = yes
+			}
+			federation = {
+				set_name = NAME_League_of_Non-Aligned_Powers
+				set_federation_flag = non_aligned_league
+			}
+			hidden_effect = {
+				# this flag not used, leave it in case other mods will use it
+				set_country_flag = formed_nonaligned_league
+				every_federation_ally = {
+					set_timed_country_flag = {
+						flag = ai_no_leave_fed
+						years = 20
+					}
+				}
+			}
+			hfe_effect_total_war_add_non_aligned_league_opinions = yes
+		}
+		# leave federation
+		else_if = {
+			limit = {
+				has_federation = yes
+			}
+			leave_alliance = {
+				override_requirements = yes
+			}
+		}
+		hidden_effect = {
+			# leader dont leave too
+			set_timed_country_flag = {
+				flag = ai_no_leave_fed
+				years = 20
+			}
+			set_country_flag = war_in_heaven_league_leader
+			every_relation = {
+				# notification and invite
+				country_event = {
+					id = hfe_total_war.1102
+				}
+			}
+			# fallens attack
+			country_event = {
+				id = hfe_total_war.1104
+				days = 90
+				random = 30
+			}
+		}
+	}
+	option = {
+		name = war_in_heaven.13.b
+		hidden_effect = {
+			set_country_flag = war_in_heaven_league_leader_declined
+			# find someone again
+			from = {
+				country_event = {
+					id = hfe_total_war.1100
+				}
+			}
+		}
+	}
+}
+
+# invite to non-aligned league 1102
+country_event = {
+	id = hfe_total_war.1102
+	title = war_in_heaven.19.name
+	desc = {
+		text = war_in_heaven.19.desc
+		trigger = {
+			from = {
+				has_federation = no
+			}
+		}
+	}
+	desc = {
+		text = war_in_heaven.19.desc3
+		trigger = {
+			from = {
+				has_federation = yes
+			}
+			NOT = {
+				is_in_federation_with = from
+			}
+		}
+	}
+	desc = {
+		text = war_in_heaven.19.desc2
+		trigger = {
+			is_in_federation_with = from
+		}
+	}
+	picture = GFX_evt_fallen_empire_awakes
+	show_sound = event_alien_signal
+	location = from
+	is_triggered_only = yes
+	trigger = {
+		is_country_type = default
+	}
+	option = {
+		name = war_in_heaven.19.a
+		trigger = {
+			is_subject = no
+			is_homicidal = no
+			not = {
+				is_in_federation_with = from
+			}
+		}
+		ai_chance = {
+			factor = 1000
+		}
+		hidden_effect = {
+			from = {
+				country_event = {
+					id = hfe_total_war.1103
+				}
+			}
+		}
+	}
+	option = {
+		trigger = {
+			is_in_federation_with = from
+		}
+		name = war_in_heaven.19.a2
+	}
+	option = {
+		trigger = {
+			NOT = {
+				is_in_federation_with = from
+			}
+		}
+		name = war_in_heaven.19.b
+	}
+	option = {
+		trigger = {
+			is_in_federation_with = from
+			is_subject = no
+		}
+		name = war_in_heaven.19.b2
+		leave_alliance = {
+			override_requirements = yes
+		}
+		ai_chance = {
+			factor = 0
+		}
+	}
+}
+
+# confirn invitation by leader of non-aligned league 1103
+country_event = {
+	id = hfe_total_war.1103
+	title = war_in_heaven.15.name
+	desc = war_in_heaven.15.desc
+	picture = GFX_evt_fallen_empire_awakes
+	show_sound = event_alien_signal
+	location = from
+	is_triggered_only = yes
+	option = {
+		name = war_in_heaven.15.a
+		ai_chance = {
+			factor = 100
+		}
+		hidden_effect = {
+			from = {
+				if = {
+					limit = {
+						is_ai = no
+					}
+					country_event = {
+						id = war_in_heaven.20
+					}
+				}
+				if = {
+					limit = {
+						has_federation = yes
+					}
+					leave_alliance = {
+						override_requirements = yes
+					}
+				}
+				set_timed_country_flag = {
+					flag = ai_no_leave_fed
+					years = 20
+				}
+			}
+		}
+		if = {
+			limit = {
+				has_federation = no
+			}
+			from = {
+				join_alliance = {
+					who = root
+					name = NAME_League_of_Non-Aligned_Powers
+					override_requirements = yes
+				}
+				hidden_effect = {
+					hfe_effect_total_war_end_wars = yes
+					root.federation = {
+						set_federation_flag = non_aligned_league
+						add_federation_experience = 4200
+						hfe_effect_total_war_non_aligned_league_exp_boost = yes
+					}
+				}
+			}
+		}
+		else = {
+			from = {
+				hidden_effect = {
+					#end rivalries, wars
+					every_rival_country = {
+						limit = {
+							has_federation = yes
+							federation = {
+								is_same_value = root.federation
+							}
+						}
+						prev = {
+							end_rivalry = prev
+						}
+					}
+					root.federation = {
+						if = {
+							limit = {
+								any_member = {
+									is_rival = prevprev
+								}
+							}
+							every_member = {
+								limit = {
+									is_rival = prevprev
+								}
+								end_rivalry = prevprev
+							}
+						}
+					}
+				}
+				join_alliance = {
+					who = root
+					override_requirements = yes
+				}
+				hidden_effect = {
+					root.federation = {
+						hfe_effect_total_war_non_aligned_league_exp_boost = yes
+					}
+				}
+				if = {
+					limit = {
+						is_overlord = yes
+						root.federation = {
+							has_federation_law = allow_subjects_to_join_yes
+						}
+					}
+					every_subject = {
+						join_alliance = {
+							who = root
+							override_requirements = yes
+						}
+						hidden_effect = {
+							root.federation = {
+								hfe_effect_total_war_non_aligned_league_exp_boost = yes
+							}
+						}
+					}
+				}
+			}
+		}
+		hfe_effect_total_war_add_non_aligned_league_opinions = yes
+	}
+	option = {
+		name = war_in_heaven.15.b
+		hidden_effect = {
+			from = {
+				add_opinion_modifier = {
+					who = root
+					modifier = opinion_non_aligned_league_declined
+				}
+			}
+			from = {
+				if = {
+					limit = {
+						is_ai = no
+					}
+					country_event = {
+						id = war_in_heaven.21
+					}
+				}
+			}
+		}
+	}
+}
+
+# all fallens declare war on non-aligned league 1104
+country_event = {
+	id = hfe_total_war.1104
+	title = war_in_heaven.16.name
+	desc = hfe_total_war.1104.desc
+	picture = GFX_evt_fallen_empire_awakes
+	show_sound = event_alien_signal
+	is_triggered_only = yes
+	trigger = {
+		exists = federation
+	}
+	immediate = {
+		if = {
+			limit = {
+				has_global_flag = hfe_general_logs
+			}
+			log = "hfe [this.GetName] is leader of non-aligned league attaked by all fallens"
+		}
+		save_event_target_as = hfe_total_war_defender
+		every_country = {
+			limit = {
+				has_country_flag = hfe_war_in_heaven_fallen
+			}
+			save_event_target_as = hfe_total_war_attaker
+			hfe_effect_total_war_declare = yes
+		}
+	}
+	option = {
+		name = war_in_heaven.16.a
+	}
+}
+
+# TODO notifications
+# one fallen killed (by another fallen or non-aligned league), non-aligned league killed, someone killed each other

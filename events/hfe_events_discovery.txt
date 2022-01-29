@@ -1,0 +1,3411 @@
+#
+namespace = hfe_discovery
+# functional events
+# install
+country_event = {
+	id = hfe_discovery.0
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		has_origin = hfe_civic_discovery_habitat
+	}
+	immediate = {
+		create_country = {
+			name = root
+			type = default
+			auto_delete = no
+			day_zero_contact = no
+			name_list = root
+			ship_prefix = ""
+			authority = root
+			civics = root
+			species = root
+			origin = hfe_civic_discovery_habitat
+			flag = root
+			ethos = root
+			ignore_initial_colony_error = yes
+			released_from_country = root
+			effect = {
+				if = {
+					limit = {
+						root = {
+							has_country_flag = hfe_host
+						}
+					}
+					set_country_flag = hfe_host
+				}
+				if = {
+					limit = {
+						root = {
+							OR = {
+								species_portrait = human
+								species_portrait = hfe_portrait_egypt
+								species_portrait = hfe_portrait_future
+								has_country_flag = hfe_marked_as_human
+							}
+						}
+					}
+					set_country_flag = hfe_discovery_men
+					set_country_flag = hfe_marked_as_human
+				}
+				set_country_flag = custom_start_screen
+				set_country_flag = hfe_discovery
+				root = {
+					capital_scope = {
+						hfe_effect_clear_buildings_and_destroy_colony = yes
+						change_pc = pc_nuked
+						reroll_planet = yes
+						save_event_target_as = hfe_discovery_location
+					}
+					every_owned_leader = {
+						set_owner = prevprev
+					}
+				}
+				set_player = root
+				country_event = {
+					id = hfe_discovery.1
+				}
+				root = {
+					set_country_flag = silence_destroy_event
+					every_owned_fleet = {
+						delete_fleet = this
+					}
+					destroy_country = yes
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_discovery.1
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		add_modifier = {
+			modifier = hfe_discovery_translator
+		}
+		add_modifier = {
+			modifier = hfe_discovery_block_colony_ship
+		}
+		set_country_flag = Story7
+		set_country_flag = first_contact_event
+		give_technology = {
+			tech = tech_sensors_2
+			message = no
+		}
+		give_technology = {
+			tech = hfe_tech_discovery_ship
+			message = no
+		}
+		create_fleet = {
+			name = hfe_discovery
+			effect = {
+				set_owner = prev
+				set_location = event_target:hfe_discovery_location
+				create_ship = {
+					name = "Mission Discovery"
+					prefix = no
+					random_existing_design = hfe_ship_size_discovery
+					effect = {
+						set_ship_flag = hfe_discovery_ship
+					}
+				}
+				# owner = {
+				# 	create_leader = {
+				# 		class = admiral
+				# 	}
+				# }
+				# assign_leader = last_created_leader
+			}
+		}
+		add_resource = {
+			minerals = 500
+			energy = 500
+			alloys = 500
+		}
+		# if = {
+		# 	limit = {
+		# 		exists = event_target:hfe_earth
+		# 		OR = {
+		# 			has_country_flag = hfe_marked_as_human
+		# 			has_country_flag = hfe_discovery_men
+		# 			species_portrait = human
+		# 			species_portrait = hfe_portrait_egypt
+		# 			species_portrait = hfe_portrait_future
+		# 		}
+		# 	}
+		# 	last_created_species = {
+		# 		set_species_homeworld = event_target:hfe_earth
+		# 	}
+		# }
+	}
+}
+
+# if discovery destroyed = end game
+# This = owner of ship 1 (destroyed)
+# From = owner of ship 2 (combatant)
+# FromFrom = ship 1
+# FromFromFrom = ship 2
+country_event = {
+	id = hfe_discovery.51
+	title = hfe_discovery.51.name
+	desc = hfe_discovery.51.desc
+	picture = GFX_evt_hfe_discovery
+	location = fromfrom
+	is_triggered_only = yes
+	show_sound = ship_destroyed_big_explosion
+	trigger = {
+		has_country_flag = hfe_discovery
+		fromfrom = {
+			has_ship_flag = hfe_discovery_ship
+		}
+	}
+	option = {
+		name = hfe_discovery.51.0
+		hidden_effect = {
+			destroy_country = yes
+		}
+		log = "HFE DISCOVERY GAME OVER!"
+	}
+}
+
+# clear discovery war target flag after war end
+# ????????? ???????? ??
+country_event = {
+	id = hfe_discovery.53
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		has_country_flag = hfe_discovery
+	}
+	immediate = {
+		country_event = {
+			id = hfe_discovery.54
+			days = 2
+		}
+	}
+}
+
+country_event = {
+	id = hfe_discovery.54
+	hide_window = yes
+	is_triggered_only = yes
+	immediate = {
+		every_country = {
+			limit = {
+				has_country_flag = hfe_discovery_war_target@root
+				nor = {
+					is_country = root
+					is_at_war_with = root
+				}
+			}
+			remove_country_flag = hfe_discovery_war_target@root
+		}
+	}
+}
+
+# make default country if have planets, kill discovery ship
+# country_event = {
+# 	id = hfe_discovery.54
+# 	hide_window = yes
+#	is_triggered_only = yes
+# 	trigger = {
+# 		#	has_country_flag = hfe_discovery
+# 		has_country_flag = hfe_discovery
+# 		num_owned_planets > 0
+# 		num_pops > 0
+# 	}
+# 	immediate = {
+# 		set_country_type = default
+# 		# random_owned_ship = {
+# 		# 	limit = {
+# 		# 		has_ship_flag = hfe_discovery_ship
+# 		# 	}
+# 		# }
+# 	}
+# }
+# instruction to dock event
+country_event = {
+	id = hfe_discovery.55
+	title = hfe_discovery.55.name
+	desc = hfe_discovery.55.desc
+	picture = GFX_evt_hfe_discovery
+	is_triggered_only = yes
+	trigger = {
+		not = {
+			has_country_flag = hfe_discovery_has_event.55
+		}
+		has_origin = hfe_civic_discovery_habitat
+		exists = from
+		from = {
+			is_country_type = default
+		}
+	}
+	immediate = {
+		set_country_flag = hfe_discovery_has_event.55
+	}
+	option = {
+		name = hfe_discovery.55.0
+	}
+}
+
+# add comms with enclaves on_entering_system
+ship_event = {
+	id = hfe_discovery.56
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		owner = {
+			has_country_flag = hfe_discovery
+		}
+		exists = solar_system
+		solar_system = {
+			any_fleet_in_system = {
+				exists = owner
+				owner = {
+					is_country_type = enclave
+					not = {
+						has_communications = root.owner
+					}
+				}
+			}
+		}
+	}
+	immediate = {
+		solar_system = {
+			random_fleet_in_system = {
+				limit = {
+					exists = owner
+					owner = {
+						is_country_type = enclave
+						not = {
+							has_communications = root.owner
+						}
+					}
+				}
+				owner = {
+					establish_communications = root.owner
+				}
+			}
+		}
+	}
+}
+
+# harvest from frags for on_ship_destroyed_perp
+# on_ship_destroyed_perp
+# This = owner of ship 1 (combatant)
+# From = owner of ship 2 (destroyed)
+# FromFrom = ship 1
+# FromFromFrom = ship 2
+country_event = {
+	id = hfe_discovery.100
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		has_country_flag = hfe_discovery
+		exists = from
+		exists = fromfrom
+		exists = fromfromfrom
+		fromfrom = {
+			has_ship_flag = hfe_discovery_ship
+		}
+	}
+	immediate = {
+		if = {
+			limit = {
+				not = {
+					has_event_chain = hfe_chain_discovery_kill_count
+				}
+			}
+			begin_event_chain = {
+				event_chain = hfe_chain_discovery_kill_count
+				target = root
+			}
+		}
+		if = {
+			limit = {
+				fromfromfrom = {
+					or = {
+						is_ship_size = destroyer
+						is_ship_size = small_ship_fallen_empire
+						is_ship_size = nomad_destroyer
+						is_ship_size = pirate_destroyer
+						is_ship_size = ancient_destroyer
+						is_ship_size = crystal_ship_small_blue
+						is_ship_size = crystal_ship_small_green
+						is_ship_size = crystal_ship_small_yellow
+						is_ship_size = crystal_ship_small_red
+						is_ship_size = crystal_ship_small_blue_elite
+						is_ship_size = crystal_ship_small_green_elite
+						is_ship_size = crystal_ship_small_yellow_elite
+						is_ship_size = crystal_ship_small_red_elite
+					}
+				}
+			}
+			add_resource = {
+				minerals = @hfe_discovery_kill_t1
+			}
+			add_event_chain_counter = {
+				event_chain = hfe_chain_discovery_kill_count
+				counter = hfe_chain_discovery_kill_count_t1
+				amount = 1
+			}
+		}
+		else_if = {
+			limit = {
+				fromfromfrom = {
+					or = {
+						is_ship_size = cruiser
+						is_ship_size = pirate_cruiser
+						is_ship_size = pirate_station
+						is_ship_size = space_amoeba_mother
+						is_ship_size = crystal_ship_medium_blue
+						is_ship_size = crystal_ship_medium_green
+						is_ship_size = crystal_ship_medium_yellow
+						is_ship_size = crystal_ship_medium_red
+						is_ship_size = crystal_ship_medium_blue_elite
+						is_ship_size = crystal_ship_medium_green_elite
+						is_ship_size = crystal_ship_medium_yellow_elite
+						is_ship_size = crystal_ship_medium_red_elite
+					}
+				}
+			}
+			add_resource = {
+				minerals = @hfe_discovery_kill_t2
+			}
+			add_event_chain_counter = {
+				event_chain = hfe_chain_discovery_kill_count
+				counter = hfe_chain_discovery_kill_count_t2
+				amount = 1
+			}
+		}
+		else_if = {
+			limit = {
+				fromfromfrom = {
+					or = {
+						is_ship_size = battleship
+						is_ship_size = large_ship_fallen_empire
+						is_ship_size = large_ship_ai
+						is_ship_size = crystal_ship_large_blue
+						is_ship_size = crystal_ship_large_green
+						is_ship_size = crystal_ship_large_yellow
+						is_ship_size = crystal_ship_large_red
+						is_ship_size = crystal_ship_large_blue_elite
+						is_ship_size = crystal_ship_large_green_elite
+						is_ship_size = crystal_ship_large_yellow_elite
+						is_ship_size = crystal_ship_large_red_elite
+					}
+				}
+			}
+			add_resource = {
+				minerals = @hfe_discovery_kill_t3
+			}
+			add_event_chain_counter = {
+				event_chain = hfe_chain_discovery_kill_count
+				counter = hfe_chain_discovery_kill_count_t3
+				amount = 1
+			}
+		}
+		else_if = {
+			limit = {
+				fromfromfrom = {
+					or = {
+						is_ship_size = colossus
+						is_ship_size = titan
+						is_ship_size = massive_ship_fallen_empire
+						is_ship_size = galleon
+						is_ship_size = marauder_galleon
+						is_ship_size = core_ai
+						is_ship_size = crystal_station_large
+						is_ship_size = asteroid
+					}
+				}
+			}
+			add_resource = {
+				minerals = @hfe_discovery_kill_t4
+			}
+			add_event_chain_counter = {
+				event_chain = hfe_chain_discovery_kill_count
+				counter = hfe_chain_discovery_kill_count_t4
+				amount = 1
+			}
+		}
+		else = {
+			add_resource = {
+				minerals = @hfe_discovery_kill_t0
+			}
+			add_event_chain_counter = {
+				event_chain = hfe_chain_discovery_kill_count
+				counter = hfe_chain_discovery_kill_count_t0
+				amount = 1
+			}
+		}
+		if = {
+			limit = {
+				from = {
+					has_country_flag = hfe_discovery_war_target@root
+				}
+				any_country = {
+					is_at_war_with = from
+					resource_stockpile_compare = {
+						resource = energy
+						value >= 10
+					}
+				}
+			}
+			if = {
+				limit = {
+					fromfromfrom = {
+						is_ship_size = corvette
+					}
+				}
+				random_country = {
+					limit = {
+						is_at_war_with = from
+						resource_stockpile_compare = {
+							resource = energy
+							value >= 10
+						}
+					}
+					add_resource = {
+						energy = -10
+					}
+					root = {
+						add_resource = {
+							energy = 10
+						}
+						add_event_chain_counter = {
+							event_chain = hfe_chain_discovery_kill_count
+							counter = hfe_chain_discovery_kill_count_reward
+							amount = 1
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					fromfromfrom = {
+						or = {
+							is_ship_size = destroyer
+						}
+					}
+				}
+				random_country = {
+					limit = {
+						is_at_war_with = from
+						resource_stockpile_compare = {
+							resource = energy
+							value >= 100
+						}
+					}
+					add_resource = {
+						energy = -100
+					}
+					root = {
+						add_resource = {
+							energy = 100
+						}
+						add_event_chain_counter = {
+							event_chain = hfe_chain_discovery_kill_count
+							counter = hfe_chain_discovery_kill_count_reward
+							amount = 1
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					fromfromfrom = {
+						or = {
+							is_ship_size = cruiser
+							is_ship_size = small_ship_fallen_empire
+						}
+					}
+				}
+				random_country = {
+					limit = {
+						is_at_war_with = from
+						resource_stockpile_compare = {
+							resource = energy
+							value >= 150
+						}
+					}
+					add_resource = {
+						energy = -150
+					}
+					root = {
+						add_resource = {
+							energy = 150
+						}
+						add_event_chain_counter = {
+							event_chain = hfe_chain_discovery_kill_count
+							counter = hfe_chain_discovery_kill_count_reward
+							amount = 1
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					fromfromfrom = {
+						or = {
+							is_ship_size = battleship
+							is_ship_size = large_ship_fallen_empire
+						}
+					}
+				}
+				random_country = {
+					limit = {
+						is_at_war_with = from
+						resource_stockpile_compare = {
+							resource = energy
+							value >= 200
+						}
+					}
+					add_resource = {
+						energy = -200
+					}
+					root = {
+						add_resource = {
+							energy = 200
+						}
+						add_event_chain_counter = {
+							event_chain = hfe_chain_discovery_kill_count
+							counter = hfe_chain_discovery_kill_count_reward
+							amount = 1
+						}
+					}
+				}
+			}
+			else_if = {
+				limit = {
+					fromfromfrom = {
+						or = {
+							is_ship_size = colossus
+							is_ship_size = titan
+							is_ship_size = massive_ship_fallen_empire
+							is_ship_size = galleon
+							is_ship_size = marauder_galleon
+						}
+					}
+				}
+				random_country = {
+					limit = {
+						is_at_war_with = from
+						resource_stockpile_compare = {
+							resource = energy
+							value >= 1000
+						}
+					}
+					add_resource = {
+						energy = -1000
+					}
+					root = {
+						add_resource = {
+							energy = 1000
+						}
+						add_event_chain_counter = {
+							event_chain = hfe_chain_discovery_kill_count
+							counter = hfe_chain_discovery_kill_count_reward
+							amount = 1
+						}
+					}
+				}
+			}
+		}
+		if = {
+			limit = {
+				from = {
+					or = {
+						is_country_type = cloud
+						is_country_type = extradimensional
+						is_country_type = extradimensional_2
+						is_country_type = extradimensional_3
+					}
+				}
+			}
+			add_resource = {
+				energy = @hfe_discovery_kill_energy
+			}
+			add_event_chain_counter = {
+				event_chain = hfe_chain_discovery_kill_count
+				counter = hfe_chain_discovery_kill_count_energy
+				amount = 1
+			}
+		}
+		if = {
+			limit = {
+				exists = fromfrom.solar_system.owner
+			}
+			fromfrom.solar_system.owner = {
+				# ???? ??? ???????????? ???????
+				if = {
+					limit = {
+						resource_stockpile_compare = {
+							resource = energy
+							value >= @hfe_discovery_kill_reward
+						}
+						is_hostile = from.owner
+						nor = {
+							is_country = from.owner
+							is_country = root
+							is_hostile = root
+						}
+					}
+					add_opinion_modifier = {
+						who = root
+						modifier = hfe_opinion_discovery_kill_reward
+					}
+					add_resource = {
+						energy = @hfe_discovery_kill_reward_minus
+					}
+					root = {
+						add_resource = {
+							energy = @hfe_discovery_kill_reward
+						}
+						add_event_chain_counter = {
+							event_chain = hfe_chain_discovery_kill_count
+							counter = hfe_chain_discovery_kill_count_reward
+							amount = 1
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+# kill check for contract pirate hunt for
+# on_ship_destroyed_perp
+country_event = {
+	id = hfe_discovery.101
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		has_country_flag = hfe_discovery
+		has_event_chain = hfe_chain_discovery_contract_pirate_hunt
+		exists = fromfromfrom
+		fromfromfrom = {
+			is_ship_class = shipclass_starbase
+			fleet = {
+				has_fleet_flag = hfe_discovery_pirate_hunt_target@root
+			}
+		}
+	}
+	immediate = {
+		end_event_chain = hfe_chain_discovery_contract_pirate_hunt
+		random_country = {
+			limit = {
+				has_country_flag = hfe_discovery_contract_pirate_hunt_hirer@root
+			}
+			add_resource = {
+				energy = @hfe_discovery_contract_pirate_hunt_reward_minus
+			}
+		}
+		add_resource = {
+			energy = @hfe_discovery_contract_pirate_hunt_reward
+		}
+	}
+}
+
+# kill check for contract clear system for
+# on_ship_destroyed_perp
+country_event = {
+	id = hfe_discovery.102
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		has_country_flag = hfe_discovery
+		has_event_chain = hfe_chain_discovery_contract_clear_system
+		exists = fromfromfrom.solar_system
+		fromfromfrom.solar_system = {
+			has_star_flag = hfe_discovery_contract_clear_system_target@root
+		}
+	}
+	immediate = {
+		fromfrom = {
+			fleet_event = {
+				id = hfe_discovery.103
+				days = 15
+			}
+		}
+		# end_event_chain = hfe_chain_discovery_contract_clear_system
+		# fromfromfrom.solar_system = {
+		# 	remove_star_flag = hfe_discovery_contract_clear_system_target@root
+		# }
+	}
+}
+
+# check enemies in target system for
+# on_entering_system
+fleet_event = {
+	id = hfe_discovery.103
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		owner = {
+			has_country_flag = hfe_discovery
+			has_event_chain = hfe_chain_discovery_contract_clear_system
+		}
+		exists = solar_system
+		solar_system = {
+			has_star_flag = hfe_discovery_contract_clear_system_target@root.owner
+			not = {
+				any_fleet_in_system = {
+					exists = owner
+					owner = {
+						is_hostile = root.owner
+					}
+				}
+			}
+		}
+	}
+	immediate = {
+		owner = {
+			end_event_chain = hfe_chain_discovery_contract_clear_system
+		}
+		solar_system = {
+			remove_star_flag = hfe_discovery_contract_clear_system_target@root.owner
+		}
+	}
+}
+
+# trade and update on planet
+# from = docking planet
+fleet_event = {
+	id = hfe_discovery.150
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		is_ship_size = hfe_ship_size_discovery
+		exists = owner
+		owner = {
+			has_country_flag = hfe_discovery
+		}
+		from = {
+			exists = owner
+			solar_system = {
+				exists = starbase
+			}
+			owner = {
+				not = {
+					is_hostile = root.owner
+				}
+			}
+		}
+	}
+	immediate = {
+		play_sound = event_airlock
+		owner = {
+			#save_event_target_as = hfe_discovery_owner
+			set_country_flag = hfe_discovery.151_block
+		}
+		from = {
+			save_event_target_as = hfe_discovery_docking_planet
+		}
+		random_owned_ship = {
+			limit = {
+				has_ship_flag = hfe_discovery_ship
+			}
+			save_event_target_as = hfe_discovery_docking_ship
+		}
+		# embassy
+		event_target:hfe_discovery_docking_planet = {
+			if = {
+				limit = {
+					has_planet_flag = hfe_discovery_contract_embassy_target@root.owner
+				}
+				remove_planet_flag = hfe_discovery_contract_embassy_target@root.owner
+				hfe_effect_remove_signal_object_from_this = yes
+				random_country = {
+					limit = {
+						has_country_flag = hfe_discovery_contract_embassy_hirer@root.owner
+					}
+					save_event_target_as = hfe_discovery_contract_embassy_hirer
+					add_resource = {
+						energy = @hfe_discovery_contract_embassy_reward_minus
+					}
+					remove_country_flag = hfe_discovery_contract_embassy_hirer@root.owner
+				}
+				root.owner = {
+					random_list = {
+						1 = {
+							set_timed_country_flag = {
+								flag = hfe_discovery_contract_embassy_success
+								days = 1
+							}
+							event_target:hfe_discovery_contract_embassy_hirer = {
+								add_opinion_modifier = {
+									who = event_target:hfe_discovery_docking_planet.owner
+									modifier = hfe_opinion_discovery_contract_embassy_success
+								}
+							}
+							event_target:hfe_discovery_docking_planet.owner = {
+								add_opinion_modifier = {
+									who = event_target:hfe_discovery_contract_embassy_hirer
+									modifier = hfe_opinion_discovery_contract_embassy_success
+								}
+							}
+						}
+						1 = {
+							set_timed_country_flag = {
+								flag = hfe_discovery_contract_embassy_fail
+								days = 1
+							}
+							event_target:hfe_discovery_contract_embassy_hirer = {
+								add_opinion_modifier = {
+									who = event_target:hfe_discovery_docking_planet.owner
+									modifier = hfe_opinion_discovery_contract_embassy_fail
+								}
+							}
+							event_target:hfe_discovery_docking_planet.owner = {
+								add_opinion_modifier = {
+									who = event_target:hfe_discovery_contract_embassy_hirer
+									modifier = hfe_opinion_discovery_contract_embassy_fail
+								}
+							}
+						}
+					}
+					add_resource = {
+						energy = @hfe_discovery_contract_embassy_reward
+					}
+					end_event_chain = hfe_chain_discovery_contract_embassy
+				}
+			}
+		}
+		# send menu event
+		owner = {
+			country_event = {
+				id = hfe_discovery.151
+			}
+		}
+	}
+}
+
+# discovery docking menu diplo
+country_event = {
+	id = hfe_discovery.151
+	title = hfe_discovery.151.name
+	desc = {
+		trigger = {
+			success_text = {
+				text = hfe_discovery.151.desc.0.0
+				hfe_trigger_discovery_docking_any_menu = no
+			}
+			success_text = {
+				text = hfe_discovery.151.0.desc
+				has_country_flag = hfe_discovery.151.0
+			}
+			success_text = {
+				text = hfe_discovery.151.1.desc
+				has_country_flag = hfe_discovery.151.1
+			}
+			success_text = {
+				text = hfe_discovery.151.2.desc
+				has_country_flag = hfe_discovery.151.2
+			}
+			success_text = {
+				text = hfe_discovery.151.4.desc
+				has_country_flag = hfe_discovery.151.4
+			}
+			# ????? ????????? ???
+			# success_text = {
+			# 	text = hfe_discovery.151.crew_menu.desc.0
+			# 	has_country_flag = hfe_discovery.151.crew_menu
+			# }
+			success_text = {
+				text = hfe_discovery.151.contract_menu.desc.0
+				has_country_flag = hfe_discovery.151.contract_menu
+			}
+			# quests
+			# no quest
+			success_text = {
+				text = hfe_discovery.151.1.0
+				hfe_trigger_discovery_docking_any_menu = no
+				hfe_trigger_discovery_docking_any_quest = no
+			}
+			# embassy
+			# embassy success
+			success_text = {
+				text = hfe_discovery.151.contract_menu.desc.1.0
+				hfe_trigger_discovery_docking_any_menu = no
+				has_country_flag = hfe_discovery_contract_embassy_success
+			}
+			# embassy fail
+			success_text = {
+				text = hfe_discovery.151.contract_menu.desc.1.1
+				hfe_trigger_discovery_docking_any_menu = no
+				has_country_flag = hfe_discovery_contract_embassy_fail
+			}
+		}
+	}
+	is_triggered_only = yes
+	diplomatic = yes
+	force_open = yes	# ??? ??? ???????
+	picture_event_data = {
+		portrait = hfe_portrait_diplo_discovery
+		room = hfe_docking_room
+	}
+	# update weapons menu
+	option = {
+		name = hfe_discovery.151.0
+		trigger = {
+			hfe_trigger_discovery_docking_any_menu = no
+		}
+		hidden_effect = {
+			set_country_flag = hfe_discovery.151.0
+			country_event = {
+				id = hfe_discovery.151
+			}
+		}
+	}
+	# ?????_???????.?????_?????????.???????_?????????
+	# update defenses menu
+	option = {
+		name = hfe_discovery.151.1
+		trigger = {
+			hfe_trigger_discovery_docking_any_menu = no
+		}
+		hidden_effect = {
+			set_country_flag = hfe_discovery.151.1
+			country_event = {
+				id = hfe_discovery.151
+			}
+		}
+	}
+	# update engine menu
+	option = {
+		name = hfe_discovery.151.2
+		trigger = {
+			hfe_trigger_discovery_docking_any_menu = no
+		}
+		hidden_effect = {
+			set_country_flag = hfe_discovery.151.2
+			country_event = {
+				id = hfe_discovery.151
+			}
+		}
+	}
+	# other menu
+	option = {
+		name = hfe_discovery.151.3
+		trigger = {
+			hfe_trigger_discovery_docking_any_menu = no
+		}
+		hidden_effect = {
+			set_country_flag = hfe_discovery.151.4
+			country_event = {
+				id = hfe_discovery.151
+			}
+		}
+	}
+	option = {
+		name = hfe_discovery.151.4.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.4
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = minerals
+				value >= 100
+			}
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 100
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.4.0.response
+		add_resource = {
+			minerals = -100
+		}
+		add_resource = {
+			energy = -100
+		}
+		create_fleet = {
+			name = "Science Ship"
+			effect = {
+				set_owner = root
+				create_ship = {
+					random_existing_design = science
+				}
+				set_fleet_stance = evasive
+				set_location = event_target:hfe_discovery_docking_ship
+			}
+		}
+		event_target:hfe_discovery_docking_planet.owner = {
+			add_resource = {
+				energy = 100
+			}
+			add_trust = {
+				who = root
+				amount = 5
+			}
+		}
+		add_trust = {
+			who = event_target:hfe_discovery_docking_planet.owner
+			amount = 5
+		}
+	}
+	# crew lvl 1
+	option = {
+		name = hfe_discovery.151.crew_menu.0.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.4
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 200
+			}
+			not = {
+				has_modifier = hfe_discovery_crew_4
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.crew_menu.0.0.response
+		add_resource = {
+			energy = -200
+		}
+		switch = {
+			trigger = has_modifier
+			hfe_discovery_crew_1 = {
+				remove_modifier = hfe_discovery_crew_1
+				add_modifier = {
+					modifier = hfe_discovery_crew_2
+				}
+			}
+			hfe_discovery_crew_2 = {
+				remove_modifier = hfe_discovery_crew_2
+				add_modifier = {
+					modifier = hfe_discovery_crew_3
+				}
+			}
+			hfe_discovery_crew_3 = {
+				remove_modifier = hfe_discovery_crew_3
+				add_modifier = {
+					modifier = hfe_discovery_crew_4
+				}
+			}
+			default = {
+				add_modifier = {
+					modifier = hfe_discovery_crew_1
+				}
+			}
+		}
+		event_target:hfe_discovery_docking_planet.owner = {
+			add_resource = {
+				energy = 100
+			}
+		}
+	}
+	# crew freeze
+	option = {
+		name = hfe_discovery.151.crew_menu.0.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.4
+		}
+		allow = {
+			resource_stockpile_compare = {
+				resource = energy
+				value >= 100
+			}
+			or = {
+				has_modifier = hfe_discovery_crew_1
+				has_modifier = hfe_discovery_crew_2
+				has_modifier = hfe_discovery_crew_3
+				has_modifier = hfe_discovery_crew_4
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.crew_menu.0.1.response
+		add_resource = {
+			energy = -200
+		}
+		switch = {
+			trigger = has_modifier
+			hfe_discovery_crew_1 = {
+				remove_modifier = hfe_discovery_crew_1
+			}
+			hfe_discovery_crew_2 = {
+				remove_modifier = hfe_discovery_crew_2
+				add_modifier = {
+					modifier = hfe_discovery_crew_1
+				}
+			}
+			hfe_discovery_crew_3 = {
+				remove_modifier = hfe_discovery_crew_3
+				add_modifier = {
+					modifier = hfe_discovery_crew_2
+				}
+			}
+			hfe_discovery_crew_4 = {
+				remove_modifier = hfe_discovery_crew_4
+				add_modifier = {
+					modifier = hfe_discovery_crew_3
+				}
+			}
+		}
+		event_target:hfe_discovery_docking_planet.owner = {
+			add_resource = {
+				energy = 100
+			}
+		}
+	}
+	# contract menu
+	option = {
+		name = hfe_discovery.151.contract_menu
+		trigger = {
+			hfe_trigger_discovery_docking_any_menu = no
+		}
+		hidden_effect = {
+			set_country_flag = hfe_discovery.151.contract_menu
+			country_event = {
+				id = hfe_discovery.151
+			}
+		}
+	}
+	# pirate hunt contract
+	option = {
+		name = hfe_discovery.151.contract_menu.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.contract_menu
+			event_target:hfe_discovery_docking_planet.owner = {
+				any_relation = {
+					has_country_flag = hfe_pirate_attack@prev
+				}
+			}
+		}
+		allow = {
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_has_contract_pirate_hunt
+				not = {
+					has_event_chain = hfe_chain_discovery_contract_pirate_hunt
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.contract_menu.0.response
+		begin_event_chain = {
+			event_chain = hfe_chain_discovery_contract_pirate_hunt
+			target = root
+		}
+		hidden_effect = {
+			event_target:hfe_discovery_docking_planet = {
+				owner = {
+					save_event_target_as = hfe_discovery_pirate_hunt_hirer
+					set_country_flag = hfe_discovery_contract_pirate_hunt_hirer@root
+				}
+				closest_system = {
+					limit = {
+						any_system_planet = {
+							exists = owner
+							owner = {
+								is_country_type = hfe_pirate
+								has_country_flag = hfe_pirate_attack@event_target:hfe_discovery_docking_planet.owner
+							}
+						}
+					}
+					random_fleet_in_system = {
+						limit = {
+							is_ship_class = shipclass_starbase
+						}
+						set_fleet_flag = hfe_discovery_pirate_hunt_target@root
+						save_event_target_as = hfe_discovery_pirate_hunt_target
+					}
+				}
+			}
+			create_point_of_interest = {
+				id = hfe_chain_discovery_contract_pirate_hunt.0
+				name = hfe_chain_discovery_contract_pirate_hunt_name.0
+				desc = hfe_chain_discovery_contract_pirate_hunt_desc.0
+				event_chain = hfe_chain_discovery_contract_pirate_hunt
+				location = event_target:hfe_discovery_pirate_hunt_target
+			}
+		}
+	}
+	# contract embassy mission
+	option = {
+		name = hfe_discovery.151.contract_menu.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.contract_menu
+			event_target:hfe_discovery_docking_planet.owner = {
+				any_relation = {
+					is_country_type = default
+					is_homicidal = no
+					their_opinion = {
+						who = prev
+						value <= -20
+					}
+					nor = {
+						is_hostile = root
+						is_hostile = prev
+						has_closed_borders = root
+					}
+					has_communications = root
+					exists = capital_scope
+				}
+			}
+		}
+		allow = {
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_has_contract_embassy
+				not = {
+					has_event_chain = hfe_chain_discovery_contract_embassy
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.contract_menu.1.response
+		begin_event_chain = {
+			event_chain = hfe_chain_discovery_contract_embassy
+			target = root
+		}
+		hidden_effect = {
+			event_target:hfe_discovery_docking_planet.owner = {
+				set_country_flag = hfe_discovery_contract_embassy_hirer@root
+				random_relation = {
+					limit = {
+						is_country_type = default
+						is_homicidal = no
+						their_opinion = {
+							who = prev
+							value <= -20
+						}
+						nor = {
+							is_hostile = root
+							is_hostile = prev
+							has_closed_borders = root
+						}
+						has_communications = root
+						exists = capital_scope
+					}
+					capital_scope = {
+						set_planet_flag = hfe_discovery_contract_embassy_target@root
+						save_event_target_as = hfe_discovery_embassy_target
+						hfe_effect_create_signal_object_for_planet = yes
+					}
+				}
+			}
+			create_point_of_interest = {
+				id = hfe_chain_discovery_contract_embassy.0
+				name = hfe_chain_discovery_contract_embassy_name.0
+				desc = hfe_chain_discovery_contract_embassy_desc.0
+				event_chain = hfe_chain_discovery_contract_embassy
+				location = event_target:hfe_discovery_embassy_target
+			}
+		}
+	}
+	# contract clear system
+	option = {
+		name = hfe_discovery.151.contract_menu.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.contract_menu
+			event_target:hfe_discovery_docking_planet.owner = {
+				any_system_within_border = {
+					any_fleet_in_system = {
+						exists = owner
+						owner = {
+							is_hostile = root
+							is_hostile = event_target:hfe_discovery_docking_planet.owner
+						}
+					}
+				}
+			}
+		}
+		allow = {
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_has_contract_clear_system
+				not = {
+					has_event_chain = hfe_chain_discovery_contract_clear_system
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.contract_menu.2.response
+		begin_event_chain = {
+			event_chain = hfe_chain_discovery_contract_clear_system
+			target = root
+		}
+		hidden_effect = {
+			event_target:hfe_discovery_docking_planet.owner = {
+				#set_country_flag = hfe_discovery_contract_clear_system_hirer@root
+				random_system_within_border = {
+					limit = {
+						any_fleet_in_system = {
+							exists = owner
+							owner = {
+								is_hostile = root
+								is_hostile = event_target:hfe_discovery_docking_planet.owner
+							}
+						}
+					}
+					save_event_target_as = hfe_discovery_clear_system_target
+					set_star_flag = hfe_discovery_contract_clear_system_target@root
+				}
+			}
+			create_point_of_interest = {
+				id = hfe_chain_discovery_contract_clear_system.0
+				name = hfe_chain_discovery_contract_clear_system_name.0
+				desc = hfe_chain_discovery_contract_clear_system_desc.0
+				event_chain = hfe_chain_discovery_contract_clear_system
+				location = event_target:hfe_discovery_clear_system_target
+			}
+		}
+	}
+	# contract join war
+	option = {
+		name = hfe_discovery.151.contract_menu.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.contract_menu
+			event_target:hfe_discovery_docking_planet.owner = {
+				is_at_war = yes
+			}
+		}
+		allow = {
+			is_at_war = no
+			event_target:hfe_discovery_docking_planet.owner = {
+				resource_stockpile_compare = {
+					resource = energy
+					value >= 100
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.contract_menu.3
+		add_resource = {
+			energy = 100
+		}
+		join_war = event_target:hfe_discovery_docking_planet.owner
+		event_target:hfe_discovery_docking_planet.owner = {
+			add_resource = {
+				energy = -100
+			}
+		}
+		hidden_effect = {
+			every_country = {
+				limit = {
+					is_at_war_with = root
+				}
+				set_country_flag = hfe_discovery_war_target@root
+			}
+		}
+	}
+	# hfe_discovery_damage lvl 0
+	option = {
+		name = hfe_discovery.151.0.0.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_damage_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_damage_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.0.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_damage_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_damage lvl 1
+	option = {
+		name = hfe_discovery.151.0.0.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_damage_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_damage_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.0.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_damage_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_damage lvl 2
+	option = {
+		name = hfe_discovery.151.0.0.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_damage_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_damage_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.0.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_damage_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_damage lvl 3
+	option = {
+		name = hfe_discovery.151.0.0.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_damage_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_damage_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.0.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_damage_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_damage lvl 4
+	option = {
+		name = hfe_discovery.151.0.0.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_damage_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_damage_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.0.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_damage_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# hfe_discovery_fire_rate lvl 0
+	option = {
+		name = hfe_discovery.151.0.1.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_fire_rate_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_fire_rate_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.1.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_fire_rate_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_fire_rate lvl 1
+	option = {
+		name = hfe_discovery.151.0.1.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_fire_rate_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_fire_rate_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.1.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_fire_rate_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_fire_rate lvl 2
+	option = {
+		name = hfe_discovery.151.0.1.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_fire_rate_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_fire_rate_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.1.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_fire_rate_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_fire_rate lvl 3
+	option = {
+		name = hfe_discovery.151.0.1.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_fire_rate_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_fire_rate_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.1.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_fire_rate_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_fire_rate lvl 4
+	option = {
+		name = hfe_discovery.151.0.1.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_fire_rate_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_fire_rate_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.1.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_fire_rate_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# hfe_discovery_accuracy lvl 0
+	option = {
+		name = hfe_discovery.151.0.2.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_accuracy_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_accuracy_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.2.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_accuracy_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_accuracy lvl 1
+	option = {
+		name = hfe_discovery.151.0.2.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_accuracy_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_accuracy_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.2.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_accuracy_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_accuracy lvl 2
+	option = {
+		name = hfe_discovery.151.0.2.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_accuracy_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_accuracy_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.2.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_accuracy_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_accuracy lvl 3
+	option = {
+		name = hfe_discovery.151.0.2.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_accuracy_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_accuracy_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.2.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_accuracy_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_accuracy lvl 4
+	option = {
+		name = hfe_discovery.151.0.2.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_accuracy_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_accuracy_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.2.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_accuracy_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# hfe_discovery_range lvl 0
+	option = {
+		name = hfe_discovery.151.0.3.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_range_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_range_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.3.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_range_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_range lvl 1
+	option = {
+		name = hfe_discovery.151.0.3.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_range_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_range_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.3.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_range_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_range lvl 2
+	option = {
+		name = hfe_discovery.151.0.3.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_range_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_range_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.3.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_range_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_range lvl 3
+	option = {
+		name = hfe_discovery.151.0.3.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_range_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_range_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.3.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_range_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_range lvl 4
+	option = {
+		name = hfe_discovery.151.0.3.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.0
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_range_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_range_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.0.3.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_range_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# hfe_discovery_hp lvl 0
+	option = {
+		name = hfe_discovery.151.1.0.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_hp_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_hp_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.0.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_hp_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_hp lvl 1
+	option = {
+		name = hfe_discovery.151.1.0.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_hp_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_hp_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.0.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_hp_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_hp lvl 2
+	option = {
+		name = hfe_discovery.151.1.0.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_hp_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_hp_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.0.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_hp_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_hp lvl 3
+	option = {
+		name = hfe_discovery.151.1.0.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_hp_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_hp_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.0.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_hp_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_hp lvl 4
+	option = {
+		name = hfe_discovery.151.1.0.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_hp_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_hp_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.0.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_hp_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# hfe_discovery_armor lvl 0
+	option = {
+		name = hfe_discovery.151.1.1.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_armor_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_armor_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.1.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_armor_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_armor lvl 1
+	option = {
+		name = hfe_discovery.151.1.1.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_armor_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_armor_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.1.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_armor_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_armor lvl 2
+	option = {
+		name = hfe_discovery.151.1.1.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_armor_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_armor_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.1.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_armor_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_armor lvl 3
+	option = {
+		name = hfe_discovery.151.1.1.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_armor_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_armor_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.1.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_armor_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_armor lvl 4
+	option = {
+		name = hfe_discovery.151.1.1.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_armor_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_armor_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.1.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_armor_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# hfe_discovery_shield lvl 0
+	option = {
+		name = hfe_discovery.151.1.2.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_shield_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_shield_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.2.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_shield_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_shield lvl 1
+	option = {
+		name = hfe_discovery.151.1.2.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_shield_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_shield_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.2.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_shield_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_shield lvl 2
+	option = {
+		name = hfe_discovery.151.1.2.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_shield_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_shield_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.2.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_shield_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_shield lvl 3
+	option = {
+		name = hfe_discovery.151.1.2.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_shield_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_shield_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.2.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_shield_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_shield lvl 4
+	option = {
+		name = hfe_discovery.151.1.2.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.1
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_shield_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_shield_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.1.2.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_shield_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# hfe_discovery_speed lvl 0
+	option = {
+		name = hfe_discovery.151.2.0.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_speed_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_speed_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.0.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_speed_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_speed lvl 1
+	option = {
+		name = hfe_discovery.151.2.0.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_speed_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_speed_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.0.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_speed_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_speed lvl 2
+	option = {
+		name = hfe_discovery.151.2.0.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_speed_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_speed_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.0.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_speed_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_speed lvl 3
+	option = {
+		name = hfe_discovery.151.2.0.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_speed_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_speed_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.0.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_speed_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_speed lvl 4
+	option = {
+		name = hfe_discovery.151.2.0.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_speed_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_speed_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.0.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_speed_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# hfe_discovery_interstellar_speed lvl 0
+	option = {
+		name = hfe_discovery.151.2.1.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_interstellar_speed_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_interstellar_speed_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.1.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_interstellar_speed_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_interstellar_speed lvl 1
+	option = {
+		name = hfe_discovery.151.2.1.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_interstellar_speed_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_interstellar_speed_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.1.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_interstellar_speed_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_interstellar_speed lvl 2
+	option = {
+		name = hfe_discovery.151.2.1.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_interstellar_speed_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_interstellar_speed_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.1.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_interstellar_speed_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_interstellar_speed lvl 3
+	option = {
+		name = hfe_discovery.151.2.1.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_interstellar_speed_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_interstellar_speed_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.1.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_interstellar_speed_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_interstellar_speed lvl 4
+	option = {
+		name = hfe_discovery.151.2.1.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_interstellar_speed_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_interstellar_speed_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.1.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_interstellar_speed_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# hfe_discovery_winddown lvl 0
+	option = {
+		name = hfe_discovery.151.2.2.0
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t0 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_winddown_0
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t0_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_winddown_0
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.2.0.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_winddown_0
+			}
+		}
+		hfe_effect_discovery_docking_t0_cost = yes
+	}
+	# hfe_discovery_winddown lvl 1
+	option = {
+		name = hfe_discovery.151.2.2.1
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t1 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_winddown_1
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t1_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_winddown_1
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.2.1.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_winddown_1
+			}
+		}
+		hfe_effect_discovery_docking_t1_cost = yes
+	}
+	# hfe_discovery_winddown lvl 2
+	option = {
+		name = hfe_discovery.151.2.2.2
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t2 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_winddown_2
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t2_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_winddown_2
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.2.2.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_winddown_2
+			}
+		}
+		hfe_effect_discovery_docking_t2_cost = yes
+	}
+	# hfe_discovery_winddown lvl 3
+	option = {
+		name = hfe_discovery.151.2.2.3
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t3 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_winddown_3
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t3_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_winddown_3
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.2.3.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_winddown_3
+			}
+		}
+		hfe_effect_discovery_docking_t3_cost = yes
+	}
+	# hfe_discovery_winddown lvl 4
+	option = {
+		name = hfe_discovery.151.2.2.4
+		trigger = {
+			has_country_flag = hfe_discovery.151.2
+			event_target:hfe_discovery_docking_planet = {
+				hfe_trigger_has_starbase_t4 = yes
+			}
+			event_target:hfe_discovery_docking_ship = {
+				not = {
+					has_modifier = hfe_discovery_winddown_4
+				}
+			}
+		}
+		allow = {
+			hfe_trigger_discovery_docking_t4_cost = yes
+			custom_tooltip = {
+				fail_text = hfe_discovery.151.fail_already_installed
+				event_target:hfe_discovery_docking_ship = {
+					not = {
+						has_modifier = hfe_discovery_winddown_4
+					}
+				}
+			}
+		}
+		is_dialog_only = yes
+		response_text = hfe_discovery.151.2.2.4.response
+		play_sound = event_ai_started
+		event_target:hfe_discovery_docking_ship = {
+			add_modifier = {
+				modifier = hfe_discovery_winddown_4
+			}
+		}
+		hfe_effect_discovery_docking_t4_cost = yes
+	}
+	# return
+	option = {
+		name = modmenu_return
+		trigger = {
+			hfe_trigger_discovery_docking_any_menu = yes
+		}
+		hidden_effect = {
+			hfe_effect_discovery_diplomacy_remove_flags = yes
+			country_event = {
+				id = hfe_discovery.151
+			}
+		}
+	}
+	# exit
+	option = {
+		name = hfe_discovery.151.exit
+		default_hide_option = yes
+		hidden_effect = {
+			remove_country_flag = hfe_discovery.151_block
+			hfe_effect_discovery_diplomacy_remove_flags = yes
+		}
+	}
+}
+
+# random story events trigger by on_entering_system_first_time
+ship_event = {
+	id = hfe_discovery.500
+	hide_window = yes
+	is_triggered_only = yes
+	trigger = {
+		exists = owner
+		is_ship_size = hfe_ship_size_discovery
+	}
+	immediate = {
+		owner = {
+			random_list = {
+				100 = {
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						has_country_flag = hfe_discovery_has_event.501
+					}
+					country_event = {
+						id = hfe_discovery.501
+						days = 1
+						random = 15
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						has_country_flag = hfe_discovery_has_event.502
+					}
+					country_event = {
+						id = hfe_discovery.502
+						days = 1
+						random = 15
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						has_country_flag = hfe_discovery_has_event.503
+					}
+					country_event = {
+						id = hfe_discovery.503
+						days = 1
+						random = 15
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						has_country_flag = hfe_discovery_has_event.504
+					}
+					country_event = {
+						id = hfe_discovery.504
+						days = 1
+						random = 15
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						has_country_flag = hfe_discovery_has_event.505
+					}
+					country_event = {
+						id = hfe_discovery.505
+						days = 1
+						random = 15
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						has_country_flag = hfe_discovery_has_event.506
+					}
+					country_event = {
+						id = hfe_discovery.506
+						days = 1
+						random = 15
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						not = {
+							has_country_flag = hfe_discovery_has_event.504
+						}
+					}
+					modifier = {
+						factor = 0
+						has_country_flag = hfe_discovery_has_event.507
+					}
+					country_event = {
+						id = hfe_discovery.507
+						days = 1
+						random = 15
+					}
+				}
+				1 = {
+					modifier = {
+						factor = 0
+						has_country_flag = hfe_discovery_has_event.508
+					}
+					country_event = {
+						id = hfe_discovery.508
+						days = 1
+						random = 15
+					}
+				}
+			}
+		}
+	}
+}
+
+country_event = {
+	id = hfe_discovery.501
+	title = hfe_discovery_private_log
+	desc = hfe_discovery.501.desc
+	picture = GFX_evt_hfe_discovery
+	location = from
+	is_triggered_only = yes
+	trigger = {
+		num_communications > 5
+	}
+	immediate = {
+		set_country_flag = hfe_discovery_has_event.501
+		random_owned_leader = {
+			limit = {
+				leader_class = scientist
+			}
+			save_event_target_as = hfe_discovery_501_scientist
+		}
+	}
+	option = {
+		name = hfe_discovery_close_log
+	}
+}
+
+country_event = {
+	id = hfe_discovery.502
+	title = hfe_discovery_private_log
+	desc = hfe_discovery.502.desc
+	picture = GFX_evt_hfe_discovery
+	location = from
+	is_triggered_only = yes
+	immediate = {
+		set_country_flag = hfe_discovery_has_event.502
+	}
+	option = {
+		name = hfe_discovery_close_log
+	}
+}
+
+country_event = {
+	id = hfe_discovery.503
+	title = hfe_discovery_private_log
+	desc = hfe_discovery.503.desc
+	picture = GFX_evt_hfe_discovery
+	location = from
+	is_triggered_only = yes
+	immediate = {
+		set_country_flag = hfe_discovery_has_event.503
+	}
+	option = {
+		name = hfe_discovery_close_log
+	}
+}
+
+country_event = {
+	id = hfe_discovery.504
+	title = hfe_discovery_private_log
+	desc = hfe_discovery.504.desc
+	picture = GFX_evt_hfe_discovery
+	location = from
+	is_triggered_only = yes
+	immediate = {
+		set_country_flag = hfe_discovery_has_event.504
+	}
+	option = {
+		name = hfe_discovery_close_log
+	}
+}
+
+country_event = {
+	id = hfe_discovery.505
+	title = hfe_discovery_captain_log
+	desc = hfe_discovery.505.desc
+	picture = GFX_evt_hfe_discovery
+	location = from
+	is_triggered_only = yes
+	immediate = {
+		set_country_flag = hfe_discovery_has_event.505
+	}
+	option = {
+		name = hfe_discovery_close_log
+	}
+}
+
+country_event = {
+	id = hfe_discovery.506
+	title = hfe_discovery_private_log
+	desc = hfe_discovery.506.desc
+	picture = GFX_evt_hfe_discovery
+	location = from
+	is_triggered_only = yes
+	immediate = {
+		set_country_flag = hfe_discovery_has_event.506
+	}
+	option = {
+		name = hfe_discovery_close_log
+	}
+}
+
+country_event = {
+	id = hfe_discovery.507
+	title = hfe_discovery_private_log
+	desc = hfe_discovery.507.desc
+	picture = GFX_evt_hfe_discovery
+	location = from
+	is_triggered_only = yes
+	immediate = {
+		set_country_flag = hfe_discovery_has_event.507
+	}
+	option = {
+		name = hfe_discovery_close_log
+	}
+}
+
+country_event = {
+	id = hfe_discovery.508
+	title = hfe_discovery_captain_log
+	desc = hfe_discovery.508.desc
+	picture = GFX_evt_hfe_discovery
+	location = from
+	is_triggered_only = yes
+	immediate = {
+		set_country_flag = hfe_discovery_has_event.508
+	}
+	option = {
+		name = hfe_discovery_close_log
+	}
+}
