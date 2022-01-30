@@ -831,7 +831,7 @@ ship_event = {
 			is_ai = no
 		}
 		not = {
-			exists = solar_system.owner
+			has_owner = yes
 		}
 	}
 	immediate = {
@@ -1418,7 +1418,7 @@ planet_event = {
 	hide_window = yes
 	is_triggered_only = yes
 	trigger = {
-		exists = solar_system.owner
+		has_owner = yes
 		has_observation_outpost = yes
 	}
 	immediate = {
@@ -3094,7 +3094,7 @@ ship_event = {
 					}
 					if = {
 						limit = {
-							exists = solar_system.owner
+							has_owner = yes
 						}
 						solar_system.owner = {
 							save_event_target_as = hfe_copernicus_owner

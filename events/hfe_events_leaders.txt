@@ -641,7 +641,7 @@ planet_event = {
 	hide_window = yes
 	is_triggered_only = yes
 	trigger = {
-		exists = solar_system.owner.ruler
+		has_owner = yes.ruler
 		solar_system.owner.ruler = {
 			has_trait = hfe_ruler_trait_terraforming
 		}

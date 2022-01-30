@@ -176,7 +176,7 @@ country_event = {
 					hfe_trigger_pirate_enabled = no
 				}
 				remove_global_flag = hfe_pirate_disable
-				every_country = {
+				every_playable_country = {
 					limit = {
 						is_country_type = default
 					}
@@ -198,7 +198,7 @@ country_event = {
 				}
 				set_global_flag = hfe_pirate_disable
 				remove_country_flag = hfe_menu_have_pirate_submenu
-				every_country = {
+				every_playable_country = {
 					limit = {
 						is_country_type = default
 					}
@@ -463,7 +463,7 @@ country_event = {
 					destroy_country = yes
 				}
 			}
-			every_country = {
+			every_playable_country = {
 				limit = {
 					has_event_chain = hfe_chain_plague_count
 				}

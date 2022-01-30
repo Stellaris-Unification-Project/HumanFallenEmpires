@@ -1313,7 +1313,7 @@ fleet_event = {
 				any_fleet_in_system = {
 					exists = owner
 					owner = {
-						is_country = root.owner
+						is_same_empire = root.owner
 					}
 					# check it
 					is_ship_class = shipclass_military

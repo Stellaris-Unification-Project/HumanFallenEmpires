@@ -649,7 +649,7 @@ country_event = {
 						}
 						is_hostile = from.owner
 						nor = {
-							is_country = from.owner
+							is_same_empire = from.owner
 							is_country = root
 							is_hostile = root
 						}

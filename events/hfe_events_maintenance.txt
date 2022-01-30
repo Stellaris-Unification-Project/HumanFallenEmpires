@@ -759,7 +759,7 @@ event = {
 					has_global_flag = hfe_future_take_robot
 				}
 				exists = event_target:hfe_future_country
-				any_country = {
+				any_playable_country = {
 					is_ai = no
 					any_owned_species = {
 						has_trait = trait_mechanical
@@ -776,7 +776,7 @@ event = {
 				2 = {
 				}
 				1 = {
-					random_country = {
+					random_playable_country = {
 						limit = {
 							is_ai = no
 							any_owned_species = {
